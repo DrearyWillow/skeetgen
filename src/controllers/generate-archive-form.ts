@@ -405,7 +405,7 @@ class GenerateArchiveForm extends HTMLElement {
 				let log = true;
 				let count = 0;
 
-				const stream = (with_media ? archive.slice() : archive).stream();
+				const stream = archive.stream();
 				const reader = create_iterable_reader(iterate_stream(stream));
 
 				for await (const entry of untar(reader)) {
