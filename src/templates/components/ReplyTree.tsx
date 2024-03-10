@@ -1,4 +1,4 @@
-import type { Records } from '@externdefs/bluesky-client/atp-schema';
+import type { AppBskyFeedPost } from '@mary/bluesky-client/lexicons';
 import { repeat } from '@intrnl/jsx-to-string';
 
 import { get_page_context } from '../context.ts';
@@ -6,11 +6,9 @@ import { get_post_url } from '../utils/url.ts';
 
 import ReplyPost from './ReplyPost.tsx';
 
-type PostRecord = Records['app.bsky.feed.post'];
-
 export interface ReplyTreeProps {
 	rkey: string;
-	post: PostRecord;
+	post: AppBskyFeedPost.Record;
 	depth: number;
 	has_next: boolean;
 }
@@ -20,7 +18,7 @@ const DESKTOP_DEPTH_LIMIT = 7;
 
 function ReplyTree({ rkey, post, depth, has_next }: ReplyTreeProps) {
 	const ctx = get_page_context();
-	const children: [rkey: string, post: PostRecord][] = [];
+	const children: [rkey: string, post: AppBskyFeedPost.Record][] = [];
 
 	{
 		const entry = ctx.post_graph.get(rkey);

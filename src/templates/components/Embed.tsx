@@ -1,4 +1,4 @@
-import type { Records } from '@externdefs/bluesky-client/atp-schema';
+import type { AppBskyFeedPost } from '@mary/bluesky-client/lexicons';
 
 import { get_page_context } from '../context.ts';
 import { get_collection_ns, get_record_key, get_repo_id } from '../utils/url.ts';
@@ -12,10 +12,8 @@ import EmbedList from './embeds/EmbedList.tsx';
 import EmbedNotFound from './embeds/EmbedNotFound.tsx';
 import EmbedPost from './embeds/EmbedPost.tsx';
 
-type PostRecord = Records['app.bsky.feed.post'];
-
 export interface EmbedProps {
-	embed: NonNullable<PostRecord['embed']>;
+	embed: NonNullable<AppBskyFeedPost.Record['embed']>;
 	large: boolean;
 }
 

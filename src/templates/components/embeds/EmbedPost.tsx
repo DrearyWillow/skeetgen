@@ -1,4 +1,4 @@
-import type { Records } from '@externdefs/bluesky-client/atp-schema';
+import type { AppBskyFeedPost } from '@mary/bluesky-client/lexicons';
 
 import { get_page_context } from '../../context.ts';
 import { format_abs_date } from '../../intl/time.ts';
@@ -6,11 +6,9 @@ import { get_blob_url, get_post_url } from '../../utils/url.ts';
 
 import EmbedImage from './EmbedImage.tsx';
 
-type PostRecord = Records['app.bsky.feed.post'];
-
 export interface EmbedPostProps {
 	rkey: string;
-	record: PostRecord;
+	record: AppBskyFeedPost.Record;
 	large: boolean;
 }
 
@@ -72,7 +70,7 @@ function EmbedPost({ rkey, record, large }: EmbedPostProps) {
 
 export default EmbedPost;
 
-function get_post_images(post: PostRecord) {
+function get_post_images(post: AppBskyFeedPost.Record) {
 	const embed = post.embed;
 
 	if (embed) {

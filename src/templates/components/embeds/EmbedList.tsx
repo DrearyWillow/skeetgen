@@ -1,16 +1,15 @@
-import type { Records, RefOf } from '@externdefs/bluesky-client/atp-schema';
+import type { AppBskyGraphDefs, AppBskyGraphList } from '@mary/bluesky-client/lexicons';
 
 import { get_blob_str } from '../../context.ts';
 import { get_blob_url } from '../../utils/url.ts';
 
-type ListPurpose = RefOf<'app.bsky.graph.defs#listPurpose'>;
-const LIST_PURPOSE_LABELS: Record<ListPurpose, string> = {
+const LIST_PURPOSE_LABELS: Record<AppBskyGraphDefs.ListPurpose, string> = {
 	'app.bsky.graph.defs#modlist': 'Moderation list',
 	'app.bsky.graph.defs#curatelist': 'Curation list',
 };
 
 export interface EmbedListProps {
-	record: Records['app.bsky.graph.list'];
+	record: AppBskyGraphList.Record;
 }
 
 function EmbedList({ record }: EmbedListProps) {

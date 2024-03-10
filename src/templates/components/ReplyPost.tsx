@@ -1,4 +1,4 @@
-import type { Records } from '@externdefs/bluesky-client/atp-schema';
+import type { AppBskyFeedPost } from '@mary/bluesky-client/lexicons';
 
 import { get_page_context } from '../context.ts';
 import { format_abs_date, format_abs_date_time } from '../intl/time.ts';
@@ -9,7 +9,7 @@ import RichTextRenderer from './RichTextRenderer.tsx';
 
 export interface ReplyPostProps {
 	rkey: string;
-	post: Records['app.bsky.feed.post'];
+	post: AppBskyFeedPost.Record;
 	has_children: boolean;
 	has_parent: boolean;
 }

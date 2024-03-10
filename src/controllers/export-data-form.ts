@@ -1,8 +1,8 @@
 import { type FileSystemFileHandle, showSaveFilePicker } from 'native-file-system-adapter';
 import map_promises from 'p-map';
 
-import { type DidDocument, Agent, getPdsEndpoint } from '@externdefs/bluesky-client/agent';
-import { type XRPCResponse, ResponseType, XRPCError } from '@externdefs/bluesky-client/xrpc-utils';
+import { type DidDocument, BskyXRPC, getPdsEndpoint } from '@mary/bluesky-client';
+import { type XRPCResponse, ResponseType, XRPCError } from '@mary/bluesky-client/xrpc';
 
 import { Logger } from '../utils/logger.tsx';
 
@@ -125,9 +125,9 @@ class ExportDataForm extends HTMLElement {
 			} else {
 				using _progress = logger.progress(`Resolving ${identifier}`);
 
-				const agent = new Agent({ serviceUri: APPVIEW_URL });
+				const rpc = new BskyXRPC({ service: APPVIEW_URL });
 
-				const response = await agent.rpc.get('com.atproto.identity.resolveHandle', {
+				const response = await rpc.get('com.atproto.identity.resolveHandle', {
 					signal: signal,
 					params: {
 						handle: identifier,
@@ -252,7 +252,7 @@ class ExportDataForm extends HTMLElement {
 
 			// Blobs
 			if (with_media) {
-				const agent = new Agent({ serviceUri: pds });
+				const rpc = new BskyXRPC({ service: pds });
 
 				let done = 0;
 				let cids: string[] = [];
@@ -261,7 +261,7 @@ class ExportDataForm extends HTMLElement {
 				{
 					using progress = logger.progress(`Retrieving list of blobs`, null);
 					do {
-						const response = await agent.rpc.get('com.atproto.sync.listBlobs', {
+						const response = await rpc.get('com.atproto.sync.listBlobs', {
 							signal: signal,
 							params: {
 								did: did,
@@ -294,7 +294,7 @@ class ExportDataForm extends HTMLElement {
 
 							while (true) {
 								try {
-									response = await agent.rpc.get('com.atproto.sync.getBlob', {
+									response = await rpc.get('com.atproto.sync.getBlob', {
 										signal: signal,
 										params: {
 											did: did,

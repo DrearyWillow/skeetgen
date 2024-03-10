@@ -1,6 +1,6 @@
-import type { RefOf, UnionOf } from '@externdefs/bluesky-client/atp-schema';
+import type { AppBskyRichtextFacet, Brand } from '@mary/bluesky-client/lexicons';
 
-export type Facet = RefOf<'app.bsky.richtext.facet'>;
-export type LinkFeature = UnionOf<'app.bsky.richtext.facet#link'>;
-export type MentionFeature = UnionOf<'app.bsky.richtext.facet#mention'>;
-export type TagFeature = UnionOf<'app.bsky.richtext.facet#tag'>;
+export type Facet = AppBskyRichtextFacet.Main;
+export type LinkFeature = Brand.Union<AppBskyRichtextFacet.Link>;
+export type MentionFeature = Brand.Union<AppBskyRichtextFacet.Mention>;
+export type TagFeature = Brand.Union<AppBskyRichtextFacet.Tag>;

@@ -1,5 +1,9 @@
-import type { RefOf } from '@externdefs/bluesky-client/atp-schema';
+import type {
+	AppBskyEmbedExternal,
+	AppBskyEmbedImages,
+	ComAtprotoRepoStrongRef,
+} from '@mary/bluesky-client/lexicons';
 
-export type EmbeddedImage = RefOf<'app.bsky.embed.images#image'>;
-export type EmbeddedLink = RefOf<'app.bsky.embed.external#external'>;
-export type EmbeddedRecord = RefOf<'com.atproto.repo.strongRef'>;
+export type EmbeddedImage = AppBskyEmbedImages.Image;
+export type EmbeddedLink = AppBskyEmbedExternal.External;
+export type EmbeddedRecord = ComAtprotoRepoStrongRef.Main;

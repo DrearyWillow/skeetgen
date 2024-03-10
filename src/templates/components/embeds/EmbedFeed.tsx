@@ -1,10 +1,10 @@
-import type { Records } from '@externdefs/bluesky-client/atp-schema';
+import type { AppBskyFeedGenerator } from '@mary/bluesky-client/lexicons';
 
 import { get_blob_str } from '../../context.ts';
 import { get_blob_url } from '../../utils/url.ts';
 
 export interface EmbedFeedProps {
-	record: Records['app.bsky.feed.generator'];
+	record: AppBskyFeedGenerator.Record;
 }
 
 function EmbedFeed({ record }: EmbedFeedProps) {

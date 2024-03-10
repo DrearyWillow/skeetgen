@@ -1,5 +1,6 @@
-import type { Records } from '@externdefs/bluesky-client/atp-schema';
 import { repeat } from '@intrnl/jsx-to-string';
+
+import type { AppBskyFeedPost } from '@mary/bluesky-client/lexicons';
 
 import { get_page_context } from '../context.ts';
 import { format_abs_date_time } from '../intl/time.ts';
@@ -9,7 +10,7 @@ import Embed from './Embed.tsx';
 import RichTextRenderer from './RichTextRenderer.tsx';
 
 interface PermalinkPostProps {
-	post: Records['app.bsky.feed.post'];
+	post: AppBskyFeedPost.Record;
 }
 
 function PermalinkPost({ post }: PermalinkPostProps) {

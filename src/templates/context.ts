@@ -1,11 +1,17 @@
-import type { AtBlob, DID, Records, RefOf } from '@externdefs/bluesky-client/atp-schema';
 import type { TrustedHTML } from '@intrnl/jsx-to-string';
+
+import type {
+	AppBskyActorDefs,
+	AppBskyFeedGenerator,
+	AppBskyFeedPost,
+	AppBskyFeedThreadgate,
+	AppBskyGraphList,
+	At,
+} from '@mary/bluesky-client/lexicons';
 
 import { CID } from 'multiformats/cid';
 
 import type { PostGraphEntry } from './utils/posts.ts';
-
-type PostRecord = Records['app.bsky.feed.post'];
 
 let curr_context: PageContext | undefined;
 
@@ -14,13 +20,13 @@ export interface BaseContext {
 	blob_dir: string;
 	asset_dir: string;
 
-	profile: RefOf<'app.bsky.actor.defs#profileViewBasic'>;
+	profile: AppBskyActorDefs.ProfileViewBasic;
 
 	records: {
-		feeds: Map<string, Records['app.bsky.feed.generator']>;
-		lists: Map<string, Records['app.bsky.graph.list']>;
-		posts: Map<string, PostRecord>;
-		threadgates: Map<string, Records['app.bsky.feed.threadgate']>;
+		feeds: Map<string, AppBskyFeedGenerator.Record>;
+		lists: Map<string, AppBskyGraphList.Record>;
+		posts: Map<string, AppBskyFeedPost.Record>;
+		threadgates: Map<string, AppBskyFeedThreadgate.Record>;
 	};
 
 	post_graph: Map<string, PostGraphEntry>;
@@ -50,7 +56,7 @@ export function get_page_context(): PageContext {
 	return curr_context!;
 }
 
-export function get_blob_str(blob: AtBlob) {
+export function get_blob_str(blob: At.Blob) {
 	const ref = CID.asCID(blob.ref);
 
 	if (ref !== null) {
@@ -65,6 +71,6 @@ export function get_blob_str(blob: AtBlob) {
 	return blob.ref.$link;
 }
 
-export function is_did(str: DID): str is DID {
+export function is_did(str: At.DID): str is At.DID {
 	return str.startsWith('did:');
 }

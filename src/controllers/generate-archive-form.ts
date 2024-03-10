@@ -1,7 +1,14 @@
 import { type FileSystemFileHandle, showSaveFilePicker } from 'native-file-system-adapter';
 
-import type { DidDocument } from '@externdefs/bluesky-client/agent';
-import type { DID, Records } from '@externdefs/bluesky-client/atp-schema';
+import type { DidDocument } from '@mary/bluesky-client';
+import type {
+	AppBskyActorProfile,
+	AppBskyFeedGenerator,
+	AppBskyFeedPost,
+	AppBskyFeedThreadgate,
+	AppBskyGraphList,
+	At,
+} from '@mary/bluesky-client/lexicons';
 
 import { CarBlockIterator } from '@ipld/car';
 import { decode as decode_cbor } from '@ipld/dag-cbor';
@@ -22,9 +29,6 @@ import { TimelinePage } from '../templates/pages/TimelinePage.tsx';
 import { WelcomePage } from '../templates/pages/WelcomePage.tsx';
 
 const supports_fsa = 'showDirectoryPicker' in globalThis;
-
-type PostRecord = Records['app.bsky.feed.post'];
-type ProfileRecord = Records['app.bsky.actor.profile'];
 
 const decoder = new TextDecoder();
 
@@ -133,12 +137,12 @@ class GenerateArchiveForm extends HTMLElement {
 		const $status = this.status.get()!;
 
 		let did: DidDocument;
-		let profile: ProfileRecord | undefined;
+		let profile: AppBskyActorProfile.Record | undefined;
 
-		const feeds = new Map<string, Records['app.bsky.feed.generator']>();
-		const lists = new Map<string, Records['app.bsky.graph.list']>();
-		const posts = new Map<string, PostRecord>();
-		const threadgates = new Map<string, Records['app.bsky.feed.threadgate']>();
+		const feeds = new Map<string, AppBskyFeedGenerator.Record>();
+		const lists = new Map<string, AppBskyGraphList.Record>();
+		const posts = new Map<string, AppBskyFeedPost.Record>();
+		const threadgates = new Map<string, AppBskyFeedThreadgate.Record>();
 
 		// 1. Retrieve posts from the archive
 		{
@@ -212,19 +216,19 @@ class GenerateArchiveForm extends HTMLElement {
 					const [collection, rkey] = key.split('/');
 
 					if (collection === 'app.bsky.feed.post') {
-						const record = read_obj(blockmap, cid) as PostRecord;
+						const record = read_obj(blockmap, cid) as AppBskyFeedPost.Record;
 						posts.set(rkey, record);
 					} else if (collection === 'app.bsky.actor.profile') {
-						const record = read_obj(blockmap, cid) as ProfileRecord;
+						const record = read_obj(blockmap, cid) as AppBskyActorProfile.Record;
 						profile = record;
 					} else if (collection === 'app.bsky.feed.generator') {
-						const record = read_obj(blockmap, cid) as Records['app.bsky.feed.generator'];
+						const record = read_obj(blockmap, cid) as AppBskyFeedGenerator.Record;
 						feeds.set(rkey, record);
 					} else if (collection === 'app.bsky.graph.list') {
-						const record = read_obj(blockmap, cid) as Records['app.bsky.graph.list'];
+						const record = read_obj(blockmap, cid) as AppBskyGraphList.Record;
 						lists.set(rkey, record);
 					} else if (collection === 'app.bsky.feed.threadgate') {
-						const record = read_obj(blockmap, cid) as Records['app.bsky.feed.threadgate'];
+						const record = read_obj(blockmap, cid) as AppBskyFeedThreadgate.Record;
 						threadgates.set(rkey, record);
 					}
 				}
@@ -254,10 +258,10 @@ class GenerateArchiveForm extends HTMLElement {
 						posts: posts,
 						threadgates: threadgates,
 					},
-					post_graph: create_posts_graph(did.id as DID, posts),
+					post_graph: create_posts_graph(did.id as At.DID, posts),
 
 					profile: {
-						did: did.id as DID,
+						did: did.id as At.DID,
 						handle: handles && handles.length > 0 ? handles[0] : 'handle.invalid',
 						displayName: profile?.displayName?.trim(),
 						avatar: profile?.avatar && get_blob_str(profile?.avatar),
@@ -439,7 +443,7 @@ class GenerateArchiveForm extends HTMLElement {
 
 			async function write_timeline_pages(
 				type: 'posts' | 'with_replies' | 'media',
-				tuples: [rkey: string, post: PostRecord][],
+				tuples: [rkey: string, post: AppBskyFeedPost.Record][],
 			) {
 				const pages = chunked(tuples, 50);
 

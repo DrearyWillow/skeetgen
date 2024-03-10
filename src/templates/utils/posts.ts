@@ -1,15 +1,13 @@
-import type { DID, Records } from '@externdefs/bluesky-client/atp-schema';
+import type { AppBskyFeedPost, At } from '@mary/bluesky-client/lexicons';
 
 import { get_record_key, get_repo_id } from './url.ts';
-
-type PostRecord = Records['app.bsky.feed.post'];
 
 export interface PostGraphEntry {
 	ancestor: string | null;
 	descendants: string[];
 }
 
-export function create_posts_graph(did: DID, posts: Map<string, PostRecord>) {
+export function create_posts_graph(did: At.DID, posts: Map<string, AppBskyFeedPost.Record>) {
 	const graph = new Map<string, PostGraphEntry>();
 
 	for (const [rkey, post] of posts) {

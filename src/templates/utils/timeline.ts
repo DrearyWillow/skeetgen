@@ -1,15 +1,13 @@
-import type { AtUri, Records } from '@externdefs/bluesky-client/atp-schema';
+import type { AppBskyFeedPost, At } from '@mary/bluesky-client/lexicons';
 
 import { get_page_context } from '../context.ts';
 
-type PostRecord = Records['app.bsky.feed.post'];
-
-export type PostTuple = [rkey: string, post: PostRecord];
+export type PostTuple = [rkey: string, post: AppBskyFeedPost.Record];
 
 export interface TimelineItem {
-	uri: AtUri;
+	uri: At.Uri;
 	rkey: string;
-	post: PostRecord;
+	post: AppBskyFeedPost.Record;
 }
 
 export interface TimelineSlice {

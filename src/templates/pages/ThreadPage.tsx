@@ -1,7 +1,8 @@
 // page: posts/:rkey.html
 
-import type { DID, Records } from '@externdefs/bluesky-client/atp-schema';
-import { repeat, type JSXNode } from '@intrnl/jsx-to-string';
+import { type JSXNode, repeat } from '@intrnl/jsx-to-string';
+
+import type { AppBskyFeedPost, At } from '@mary/bluesky-client/lexicons';
 
 import { type PageContext, get_page_context, get_blob_str } from '../context.ts';
 import {
@@ -20,11 +21,9 @@ import Page from '../components/Page.tsx';
 import PermalinkPost from '../components/PermalinkPost.tsx';
 import ReplyTree from '../components/ReplyTree.tsx';
 
-type PostRecord = Records['app.bsky.feed.post'];
-
 interface ThreadPageProps {
 	rkey: string;
-	post: PostRecord;
+	post: AppBskyFeedPost.Record;
 }
 
 const MAX_ANCESTORS = 6;
@@ -44,8 +43,8 @@ export function ThreadPage({ rkey, post }: ThreadPageProps) {
 	let top_post = post;
 	let top_rkey = rkey;
 
-	let ancestors: [rkey: string, post: PostRecord][] = [];
-	let children: [rkey: string, post: PostRecord][] = [];
+	let ancestors: [rkey: string, post: AppBskyFeedPost.Record][] = [];
+	let children: [rkey: string, post: AppBskyFeedPost.Record][] = [];
 
 	let reply_state = ExternalReply.NO;
 	let root_rkey: string | undefined;
@@ -112,7 +111,7 @@ export function ThreadPage({ rkey, post }: ThreadPageProps) {
 
 			{
 				const root_uri = reply.root.uri;
-				const repo = get_repo_id(root_uri) as DID;
+				const repo = get_repo_id(root_uri) as At.DID;
 				const rkey = get_record_key(root_uri);
 
 				if (repo === our_did && ctx.records.posts.has(rkey)) {
@@ -208,12 +207,12 @@ export function ThreadPage({ rkey, post }: ThreadPageProps) {
 	);
 }
 
-function get_title(ctx: PageContext, post: PostRecord): string {
+function get_title(ctx: PageContext, post: AppBskyFeedPost.Record): string {
 	const author = ctx.profile;
 	return `${author.displayName || `@${author.handle}`}: "${post.text}"`;
 }
 
-function get_embed_head(ctx: PageContext, post: PostRecord): JSXNode {
+function get_embed_head(ctx: PageContext, post: AppBskyFeedPost.Record): JSXNode {
 	const nodes: JSXNode = [];
 
 	const embed = post.embed;

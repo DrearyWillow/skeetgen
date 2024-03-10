@@ -1,26 +1,26 @@
-import type { AtUri } from '@externdefs/bluesky-client/atp-schema';
+import type { At } from '@mary/bluesky-client/lexicons';
 
 import { get_page_context } from '../context.ts';
 import { get_dirname, join_path, relative_path } from './path.ts';
 
-export function get_record_key(uri: AtUri) {
+export function get_record_key(uri: At.Uri) {
 	const idx = uri.lastIndexOf('/');
 	return uri.slice(idx + 1);
 }
 
-export function get_collection_ns(uri: AtUri) {
+export function get_collection_ns(uri: At.Uri) {
 	const first = uri.indexOf('/', 5);
 	const second = uri.indexOf('/', first + 1);
 
 	return uri.slice(first + 1, second);
 }
 
-export function get_repo_id(uri: AtUri) {
+export function get_repo_id(uri: At.Uri) {
 	const idx = uri.indexOf('/', 5);
 	return uri.slice(5, idx);
 }
 
-export function get_bsky_app_url(uri: AtUri) {
+export function get_bsky_app_url(uri: At.Uri) {
 	const repo = get_repo_id(uri);
 	const ns = get_collection_ns(uri);
 	const rkey = get_record_key(uri);

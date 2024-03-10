@@ -1,4 +1,4 @@
-import type { DID } from '@externdefs/bluesky-client/atp-schema';
+import type { At } from '@mary/bluesky-client/lexicons';
 
 import { get_page_context } from '../../context.ts';
 import { get_bsky_app_url, get_collection_ns, get_repo_id } from '../../utils/url.ts';
@@ -16,7 +16,7 @@ const COLLECTION_LABELS: Record<string, string> = {
 function EmbedNotFound({ uri }: EmbedNotFoundProps) {
 	const ctx = get_page_context();
 
-	const repo = get_repo_id(uri) as DID;
+	const repo = get_repo_id(uri) as At.DID;
 	const ns = get_collection_ns(uri);
 
 	const ns_label = ns in COLLECTION_LABELS ? COLLECTION_LABELS[ns] : `record (${ns})`;

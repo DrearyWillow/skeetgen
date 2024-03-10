@@ -1,4 +1,4 @@
-import type { Records } from '@externdefs/bluesky-client/atp-schema';
+import type { AppBskyFeedPost } from '@mary/bluesky-client/lexicons';
 
 import { get_page_context } from '../context.ts';
 import { format_abs_date, format_abs_date_time } from '../intl/time.ts';
@@ -7,11 +7,9 @@ import { get_blob_url, get_post_url } from '../utils/url.ts';
 import Embed from './Embed.tsx';
 import RichTextRenderer from './RichTextRenderer.tsx';
 
-type PostRecord = Records['app.bsky.feed.post'];
-
 export interface FeedPost {
 	rkey: string;
-	post: PostRecord;
+	post: AppBskyFeedPost.Record;
 	/** Changes the condition for reply counter display from >1 to >0 */
 	always_show_replies: boolean;
 	/** Post is connected to a parent */

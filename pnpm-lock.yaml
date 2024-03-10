@@ -13,15 +13,15 @@ dependencies:
   '@akryum/flexsearch-es':
     specifier: ^0.7.32
     version: 0.7.32
-  '@externdefs/bluesky-client':
-    specifier: ^0.3.14
-    version: 0.3.14
   '@ipld/car':
     specifier: ^5.3.0
     version: 5.3.0
   '@ipld/dag-cbor':
     specifier: ^9.2.0
     version: 9.2.0
+  '@mary/bluesky-client':
+    specifier: npm:@jsr/mary__bluesky-client@^0.5.4
+    version: /@jsr/mary__bluesky-client@0.5.4
   multiformats:
     specifier: ^12.1.3
     version: 12.1.3
@@ -524,10 +524,6 @@ packages:
     dev: true
     optional: true
 
-  /@externdefs/bluesky-client@0.3.14:
-    resolution: {integrity: sha512-Y6tBURjHv//vQunxUFoRtkmidvuANZbdhP7jLlA2otnTBV6krfgmT+l/lNLo1BUvvo6jKlsrWiNxa+AUH2X9NQ==}
-    dev: false
-
   /@intrnl/jsx-to-string@0.1.6(@babel/core@7.24.0):
     resolution: {integrity: sha512-ib6FWU0GcJdzsBv8zvFj43IDNRakWoC8JlpRDYBsOgIl3aXCR2PKazE6CnRJxmSvSHF9FQ5tgaLGFGSBGTjy1Q==}
     dependencies:
@@ -605,6 +601,10 @@ packages:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
+
+  /@jsr/mary__bluesky-client@0.5.4:
+    resolution: {integrity: sha512-QcDAlqahSpi5W9hZkaTEKubmOfp8Ob93yUduj3P8UfIzEoo5pOOfrDFabLhpB2Abv9DFdTKTGzXNSjoco5TRPg==, tarball: https://npm.jsr.io/~/7/@jsr/mary__bluesky-client/0.5.4.tgz}
+    dev: false
 
   /@minify-html/node@0.11.1:
     resolution: {integrity: sha512-f+3VvBszFaY5xx8e7POka1K1FnVZur8Apk18uaI4lSyZrzmpLlkSBZfXOPHVhChFc0TDI+RQuBD+ws4qIt9+mg==}
