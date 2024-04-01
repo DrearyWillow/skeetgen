@@ -5,6 +5,7 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && pnpm run gen && vite build",
+		"publish": "pnpm run build && scripts/publish.sh",
 		"gen": "wireit",
 		"preview": "vite preview",
 		"fmt": "prettier --cache --write ."
