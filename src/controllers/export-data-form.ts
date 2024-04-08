@@ -399,7 +399,7 @@ function any(...signals: AbortSignal[]): AbortSignal {
 			break;
 		}
 
-		signal.addEventListener('abort', () => controller.abort(dep.reason), { signal });
+		dep.addEventListener('abort', () => controller.abort(dep.reason), { signal });
 	}
 
 	return signal;
