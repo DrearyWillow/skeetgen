@@ -262,7 +262,7 @@ class ExportDataForm extends HTMLElement {
 					using progress = logger.progress(`Retrieving list of blobs`, null);
 					do {
 						const response = await rpc.get('com.atproto.sync.listBlobs', {
-							signal: signal,
+							signal: any(signal, AbortSignal.timeout(90_000)),
 							params: {
 								did: did,
 								cursor: cursor,
@@ -385,4 +385,22 @@ function get_cid_segment(cid: string) {
 
 function sleep(ms: number) {
 	return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
+
+function any(...signals: AbortSignal[]): AbortSignal {
+	const controller = new AbortController();
+	const signal = controller.signal;
+
+	for (let i = 0, il = signals.length; i < il; i++) {
+		const dep = signals[i];
+
+		if (dep.aborted) {
+			controller.abort(dep.reason);
+			break;
+		}
+
+		signal.addEventListener('abort', () => controller.abort(dep.reason), { signal });
+	}
+
+	return signal;
 }
