@@ -204,6 +204,7 @@ class ExportDataForm extends HTMLElement {
 					data: JSON.stringify(doc),
 				});
 
+				logger.log(`Writing DID document to archive`);
 				await writable.write(entry);
 			}
 
@@ -246,7 +247,9 @@ class ExportDataForm extends HTMLElement {
 					data: bytes,
 				});
 
+				console.log(`Writing repository to archive (${format_bytes(size)})`);
 				await writable.write(entry);
+
 				signal.throwIfAborted();
 			}
 
