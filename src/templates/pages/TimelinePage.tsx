@@ -4,10 +4,10 @@ import { get_page_context } from '../context.ts';
 import { get_relative_url } from '../utils/url.ts';
 
 import { create_pagination } from '../utils/pagination.ts';
-import { type PostTuple, create_timeline_slices } from '../utils/timeline.ts';
+import { create_timeline_slices, type PostTuple } from '../utils/timeline.ts';
 
-import Page from '../components/Page.tsx';
 import FeedPost from '../components/FeedPost.tsx';
+import Page from '../components/Page.tsx';
 
 type FilterType = 'posts' | 'with_replies' | 'media';
 

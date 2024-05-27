@@ -1,7 +1,7 @@
-import { type TrustedHTML, repeat } from '@intrnl/jsx-to-string';
+import { repeat, type TrustedHTML } from '@intrnl/jsx-to-string';
 
-import type { Facet } from '../utils/richtext/types.ts';
 import { segment_richtext } from '../utils/richtext/segmentize.ts';
+import type { Facet } from '../utils/richtext/types.ts';
 import { get_bsky_app_url } from '../utils/url.ts';
 
 export interface RichTextRendererProps {

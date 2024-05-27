@@ -1,10 +1,10 @@
 // page: posts/:rkey.html
 
-import { type JSXNode, repeat } from '@intrnl/jsx-to-string';
+import { repeat, type JSXNode } from '@intrnl/jsx-to-string';
 
 import type { AppBskyFeedPost, At } from '@mary/bluesky-client/lexicons';
 
-import { type PageContext, get_page_context, get_blob_str } from '../context.ts';
+import { get_blob_str, get_page_context, type PageContext } from '../context.ts';
 import {
 	get_blob_url,
 	get_bsky_app_url,

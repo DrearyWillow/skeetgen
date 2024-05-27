@@ -1,5 +1,5 @@
-import { create_utf_string, get_utf8_length, slice_utf8 } from './unicode.ts';
 import type { Facet, LinkFeature, MentionFeature, TagFeature } from './types.ts';
+import { create_utf_string, get_utf8_length, slice_utf8 } from './unicode.ts';
 
 export interface RichTextSegment {
 	text: string;

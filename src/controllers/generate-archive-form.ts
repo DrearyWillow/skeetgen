@@ -1,4 +1,4 @@
-import { type FileSystemFileHandle, showSaveFilePicker } from 'native-file-system-adapter';
+import { showSaveFilePicker, type FileSystemFileHandle } from 'native-file-system-adapter';
 
 import type { DidDocument } from '@mary/bluesky-client';
 import type {
@@ -18,10 +18,10 @@ import { target } from '../utils/controller.ts';
 import { assert, create_iterable_reader, iterate_stream } from '../utils/misc.ts';
 import { untar, write_tar_entry } from '../utils/tar.ts';
 
-import { type BaseContext, get_blob_str, render_page } from '../templates/context.ts';
+import { get_blob_str, render_page, type BaseContext } from '../templates/context.ts';
+import { chunked } from '../templates/utils/misc.ts';
 import { create_posts_graph } from '../templates/utils/posts.ts';
 import { get_tid_segment } from '../templates/utils/url.ts';
-import { chunked } from '../templates/utils/misc.ts';
 
 import { SearchPage } from '../templates/pages/SearchPage.tsx';
 import { ThreadPage } from '../templates/pages/ThreadPage.tsx';
