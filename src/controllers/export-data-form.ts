@@ -81,29 +81,34 @@ class ExportDataForm extends HTMLElement {
 					],
 				});
 
-				promise.then((fd) => {
-					if (signal.aborted) {
-						return;
-					}
+				promise.then(
+					(fd) => {
+						if (signal.aborted) {
+							return;
+						}
 
-					window.addEventListener('beforeunload', this.handle_before_unload);
+						window.addEventListener('beforeunload', this.handle_before_unload);
 
-					this.download_archive(signal, logger, fd, identifier, with_media).then(
-						() => {
-							window.removeEventListener('beforeunload', this.handle_before_unload);
-						},
-						(err) => {
-							if (signal.aborted) {
-								return;
-							}
+						this.download_archive(signal, logger, fd, identifier, with_media).then(
+							() => {
+								window.removeEventListener('beforeunload', this.handle_before_unload);
+							},
+							(err) => {
+								if (signal.aborted) {
+									return;
+								}
 
-							window.removeEventListener('beforeunload', this.handle_before_unload);
+								window.removeEventListener('beforeunload', this.handle_before_unload);
 
-							console.error(err);
-							logger.error(err.message);
-						},
-					);
-				});
+								console.error(err);
+								logger.error(err.message);
+							},
+						);
+					},
+					(err) => {
+						logger.warn(`Opened the file picker, but it was aborted`);
+					},
+				);
 			});
 		}
 	}
