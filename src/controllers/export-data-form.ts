@@ -106,7 +106,13 @@ class ExportDataForm extends HTMLElement {
 						);
 					},
 					(err) => {
-						logger.warn(`Opened the file picker, but it was aborted`);
+						console.warn(err);
+
+						if (err instanceof DOMException && err.name === 'AbortError') {
+							logger.warn(`Opened the file picker, but it was aborted`);
+						} else {
+							logger.warn(`Something went wrong when opening the file picker`);
+						}
 					},
 				);
 			});
