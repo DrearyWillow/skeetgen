@@ -1,49 +1,60 @@
-import type { AppBskyFeedPost } from '@mary/bluesky-client/lexicons';
+import type { AppBskyFeedPost, At } from '@mary/bluesky-client/lexicons';
 import { repeat } from '@intrnl/jsx-to-string';
 
-import { get_page_context } from '../context.ts';
+// import { get_page_context } from '../context.ts';
 import { get_post_url } from '../utils/url.ts';
 
 import ReplyPost from './ReplyPost.tsx';
+import type { ContextMap } from '../context.ts';
+import type { ContextData } from '../context.ts';
+import type { AllPostsMap, PostGraphMap } from '../utils/posts.ts';
 
 export interface ReplyTreeProps {
-	rkey: string;
+	uri: At.Uri;
 	post: AppBskyFeedPost.Record;
 	depth: number;
 	has_next: boolean;
+    ctx: ContextMap;
+    archive: ContextData;
+    path: string;
+    graph: PostGraphMap;
+    posts: AllPostsMap;
 }
 
 const MOBILE_DEPTH_LIMIT = 3;
 const DESKTOP_DEPTH_LIMIT = 7;
 
-function ReplyTree({ rkey, post, depth, has_next }: ReplyTreeProps) {
-	const ctx = get_page_context();
-	const children: [rkey: string, post: AppBskyFeedPost.Record][] = [];
+function ReplyTree({ uri, post, depth, has_next, ctx, archive, path, graph, posts }: ReplyTreeProps) {
+	const children: [uri: At.Uri, post: AppBskyFeedPost.Record][] = [];
 
 	{
-		const entry = ctx.post_graph.get(rkey);
+		const entry = graph.get(uri);
 		if (entry !== undefined) {
-			const posts = ctx.records.posts;
 			const descendants = entry.descendants;
 
 			for (let i = 0, ilen = descendants.length; i < ilen; i++) {
-				const child_rkey = descendants[i];
-				const child_post = posts.get(child_rkey);
+				const child_uri = descendants[i];
+				const child_post = posts.get(child_uri);
 
 				if (child_post !== undefined) {
-					children.push([child_rkey, child_post]);
+					children.push([child_uri, child_post]);
 				}
 			}
 		}
 	}
 
 	const render_children = () => {
-		return repeat(children, ([child_rkey, child_post], index) => (
+		return repeat(children, ([uri, child_post], index) => (
 			<ReplyTree
-				rkey={child_rkey}
+				uri={uri}
 				post={child_post}
 				depth={depth + 1}
 				has_next={index !== children.length - 1}
+                ctx={ctx}
+                archive={archive}
+                path={path}
+                graph={graph}
+                posts={posts}
 			/>
 		));
 	};
@@ -53,7 +64,7 @@ function ReplyTree({ rkey, post, depth, has_next }: ReplyTreeProps) {
 			<div class="ReplyTree__hasMore">
 				<div class="ReplyTree__hasMoreLine"></div>
 
-				<a href={get_post_url(rkey)} class="Link ReplyTree__hasMoreText">
+				<a href={get_post_url(uri, ctx, path)} class="Link ReplyTree__hasMoreText">
 					show {children.length} {children.length === 1 ? 'reply' : 'replies'}
 				</a>
 			</div>
@@ -64,7 +75,7 @@ function ReplyTree({ rkey, post, depth, has_next }: ReplyTreeProps) {
 		<div class="ReplyTree">
 			{has_next ? <div class="ReplyTree__hasSiblingLine"></div> : null}
 
-			<ReplyPost rkey={rkey} post={post} has_children={children.length > 0} has_parent={depth > 0} />
+			<ReplyPost uri={uri} post={post} has_children={children.length > 0} has_parent={depth > 0} ctx={ctx} archive={archive} path={path}/>
 
 			{children.length > 0 && (
 				<div class="ReplyTree__children">

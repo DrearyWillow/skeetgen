@@ -1,0 +1,27 @@
+.EmbedVideo {
+}
+
+.EmbedVideo--bordered {
+	@apply overflow-hidden rounded-md border;
+}
+
+.EmbedVideo__videoContainer {
+	@apply relative w-full overflow-hidden;
+}
+
+.EmbedVideo__videoContainer--aspectRatio {
+	@apply aspect-video;
+}
+
+.EmbedVideo__videoContainer--noRatio {
+	@apply max-h-[320px] min-h-[64px] min-w-[64px] max-w-full;
+}
+
+.EmbedVideo__video {
+	@apply w-full h-full object-cover text-[0px] bg-black;
+	display: block;
+}
+
+.EmbedVideo__altButton {
+  @apply absolute top-2 right-2 z-20 bg-neutral-800/80 text-white text-xs font-semibold py-0.5 px-2 rounded cursor-pointer hover:bg-neutral-700;
+}

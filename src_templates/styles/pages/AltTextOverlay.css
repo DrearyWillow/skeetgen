@@ -1,0 +1,23 @@
+.AltTextOverlay {
+    @apply fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50
+}
+
+.AltTextOverlay__header {
+    @apply text-lg font-semibold mb-2
+}
+
+.AltTextOverlay__content {
+    @apply text-sm leading-relaxed break-all whitespace-pre-wrap;
+}
+
+.AltTextOverlay__button {
+    @apply mt-4 bg-neutral-800 hover:bg-neutral-700 text-white/100 py-1 px-3 rounded text-sm;
+}
+
+.AltTextOverlay--hidden {
+    @apply hidden
+}
+
+.AltTextOverlay__contentContainer {
+    @apply bg-neutral-900/95 p-6 rounded max-w-3xl w-full shadow-lg flex flex-col items-start max-h-[80vh] overflow-y-auto text-white/100;
+}

@@ -1,28 +1,33 @@
-import type { AppBskyFeedPost } from '@mary/bluesky-client/lexicons';
+import type { AppBskyFeedPost, At } from '@mary/bluesky-client/lexicons';
 
-import { get_page_context } from '../context.ts';
+// import { get_page_context } from '../context.ts';
 import { format_abs_date, format_abs_date_time } from '../intl/time.ts';
 import { get_blob_url, get_post_url } from '../utils/url.ts';
 
 import Embed from './Embed.tsx';
 import RichTextRenderer from './RichTextRenderer.tsx';
+import type { ContextMap } from '../context.ts';
+import type { ContextData } from '../context.ts';
 
 export interface ReplyPostProps {
-	rkey: string;
+	uri: At.Uri;
 	post: AppBskyFeedPost.Record;
 	has_children: boolean;
 	has_parent: boolean;
+    ctx: ContextMap;
+    archive: ContextData;
+    path: string;
 }
 
-function ReplyPost({ rkey, post, has_children, has_parent }: ReplyPostProps) {
-	const ctx = get_page_context();
+function ReplyPost({ uri, post, has_children, has_parent, ctx, archive, path }: ReplyPostProps) {
+	// const ctx = get_page_context();
 
 	return (
 		<div class="ReplyPost">
 			<div class="ReplyPost__aside">
 				<div class="ReplyPost__avatarContainer">
-					{ctx.profile.avatar ? (
-						<img loading="lazy" src={get_blob_url(ctx.profile.avatar)} class="ReplyPost__avatar" />
+					{archive.profile.avatar ? (
+						<img loading="lazy" src={get_blob_url(archive.profile.avatar, archive, path)} class="ReplyPost__avatar" />
 					) : null}
 				</div>
 
@@ -33,12 +38,12 @@ function ReplyPost({ rkey, post, has_children, has_parent }: ReplyPostProps) {
 			<div class="ReplyPost__main">
 				<div class="ReplyPost__header">
 					<span class="ReplyPost__nameContainer">
-						{ctx.profile.displayName ? (
+						{archive.profile.displayName ? (
 							<bdi class="ReplyPost__displayNameContainer">
-								<span class="ReplyPost__displayName">{ctx.profile.displayName}</span>
+								<span class="ReplyPost__displayName">{archive.profile.displayName}</span>
 							</bdi>
 						) : (
-							<span class="ReplyPost__handle">@{ctx.profile.handle}</span>
+							<span class="ReplyPost__handle">@{archive.profile.handle}</span>
 						)}
 					</span>
 
@@ -47,7 +52,7 @@ function ReplyPost({ rkey, post, has_children, has_parent }: ReplyPostProps) {
 					</span>
 
 					<a
-						href={get_post_url(rkey)}
+						href={get_post_url(uri, ctx, path)}
 						aria-label={format_abs_date_time(post.createdAt)}
 						class="ReplyPost__datetime"
 					>
@@ -59,7 +64,7 @@ function ReplyPost({ rkey, post, has_children, has_parent }: ReplyPostProps) {
 					<RichTextRenderer text={post.text} facets={post.facets} />
 				</div>
 
-				{post.embed ? <Embed embed={post.embed} large={false} /> : null}
+				{post.embed ? <Embed embed={post.embed} large={false} archive={archive} ctx={ctx} path={path} /> : null}
 			</div>
 		</div>
 	);

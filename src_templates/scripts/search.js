@@ -2,13 +2,13 @@ import * as FlexSearch from '@akryum/flexsearch-es';
 
 import { app, h, memo, text } from './dependencies/hyperapp.js';
 
-/** @typedef {[rkey: string, text: string, timestamp: number, flags: number] & { idx: number }} PostEntry */
+/** @typedef {[rkey: string, text: string, timestamp: number, flags: number, alt: string, profile: {displayName: string, handle: string}] & { idx: number }} PostEntry */
 
 /** @type {FlexSearch.Document<PostEntry, true>} */
 const index = new FlexSearch.Document({
 	document: {
 		id: '0',
-		index: ['1'],
+		index: ['1', '4'], // post text and alt text
 		store: true,
 	},
 });
@@ -46,6 +46,7 @@ const index = new FlexSearch.Document({
 	const HAS_EMBED_RECORD = 1 << 2;
 	const HAS_EMBED_FEED = 1 << 3;
 	const HAS_EMBED_LIST = 1 << 4;
+    const HAS_EMBED_VIDEO = 1 << 5;
 
 	const SORT_RELEVANT = 'relevant';
 	const SORT_NEW = 'new';
@@ -127,14 +128,16 @@ const index = new FlexSearch.Document({
 	}
 
 	function render_search_item({ item }) {
-		const [rkey, post_text, ts, flags] = item;
+        const [postref, post_text, ts, flags, alt, profile] = item;
 
 		return h('div', { class: 'SearchItem__content' }, [
-			h('a', { href: `posts/${rkey}.html`, class: 'SearchItem__timestamp' }, [
+            h('p', { class: 'SearchItem__displayName'}, text(`@${profile.handle}`)),
+			h('a', { href: `posts/${postref}.html`, class: 'SearchItem__timestamp' }, [
 				text(ts === 0 ? 'N/A' : abs_with_time.format(ts)),
 			]),
 			h('p', { class: 'SearchItem__body' }, [text(post_text)]),
 			(flags & HAS_EMBED_IMAGE) !== 0 && h('p', { class: 'SearchItem__accessory' }, text('[image]')),
+			(flags & HAS_EMBED_VIDEO) !== 0 && h('p', { class: 'SearchItem__accessory' }, text('[video]')),
 		]);
 	}
 }

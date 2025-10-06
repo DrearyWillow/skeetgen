@@ -66,7 +66,14 @@ export function write_tar_entry(entry: TarFileEntry): ArrayBuffer {
 		}
 	}
 
-	const data_buf = normalize_data(data);
+    // --- Detect directory ---
+    const is_directory = filename.endsWith("/");
+    // --- Normalize mode ---
+    const mode = attrs.mode ?? (is_directory ? 0o755 : 0o664);
+
+    const data_buf = is_directory ? new Uint8Array(0) : normalize_data(data);
+
+	// const data_buf = normalize_data(data);
 	const data_size = data_buf.byteLength;
 
 	const padding_size = RECORD_SIZE - (data_size % RECORD_SIZE || RECORD_SIZE);
@@ -77,7 +84,8 @@ export function write_tar_entry(entry: TarFileEntry): ArrayBuffer {
 	write_str(buf, name, 0, 100);
 
 	// File mode
-	write_str(buf, pad(attrs.mode ?? 0o664, 7), 100, 8);
+	// write_str(buf, pad(attrs.mode ?? 0o664, 7), 100, 8);
+    write_str(buf, pad(mode, 7), 100, 8);
 
 	// UID
 	write_str(buf, pad(attrs.uid ?? 1000, 7), 108, 8);
@@ -92,7 +100,8 @@ export function write_tar_entry(entry: TarFileEntry): ArrayBuffer {
 	write_str(buf, pad(attrs.mtime ?? Date.now(), 11), 136, 12);
 
 	// File type
-	write_str(buf, '0', 156, 12);
+	// write_str(buf, '0', 156, 12);
+    write_str(buf, is_directory ? '5' : '0', 156, 1);
 
 	// Ustar
 	write_str(buf, 'ustar00', 257, 8);
@@ -115,10 +124,14 @@ export function write_tar_entry(entry: TarFileEntry): ArrayBuffer {
 	}
 
 	// Actual data
-	{
-		const dest = new Uint8Array(buf, 512, data_size);
-		dest.set(data_buf, 0);
-	}
+	// {
+	// 	const dest = new Uint8Array(buf, 512, data_size);
+	// 	dest.set(data_buf, 0);
+	// }
+    if (!is_directory && data_size > 0) {
+        const dest = new Uint8Array(buf, 512, data_size)
+        dest.set(data_buf, 0)
+    }
 
 	return buf;
 }

@@ -39,6 +39,9 @@
 .EmbedPost__imageAside {
 	@apply mb-[12px] ml-[12px] mt-[8px] grow basis-0;
 }
+.EmbedPost__videoAside {
+	@apply mb-[12px] ml-[12px] mt-[8px] grow basis-0;
+}
 .EmbedPost__text {
 	@apply mx-[12px] mb-[12px] mt-[4px] line-clamp-6 min-w-0 grow-[4] basis-0 whitespace-pre-wrap break-words;
 }

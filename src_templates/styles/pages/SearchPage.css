@@ -24,6 +24,8 @@
 }
 .SearchItem__content {
 }
+.SearchItem__displayName {
+}
 .SearchItem__timestamp {
 	@apply mb-[2px] text-neutral-400/100 hover:underline;
 }

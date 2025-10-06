@@ -2,29 +2,26 @@
 
 import { repeat, type JSXNode } from '@intrnl/jsx-to-string';
 
-import type { AppBskyFeedPost, At } from '@mary/bluesky-client/lexicons';
+import type { AppBskyFeedPost, AppBskyActorDefs, At } from '@mary/bluesky-client/lexicons';
+import type { ContextMap } from '../context.ts';
+import type { ContextData } from '../context.ts';
+import type { AllPostsMap, PostGraphMap } from '../utils/posts.ts';
 
-import { get_blob_str, get_page_context, type PageContext } from '../context.ts';
+import { get_blob_str } from '../context.ts';
 import {
 	get_blob_url,
 	get_bsky_app_url,
 	get_collection_ns,
 	get_post_url,
-	get_record_key,
 	get_repo_id,
 } from '../utils/url.ts';
 
-import type { EmbeddedImage, EmbeddedRecord } from '../utils/embed.ts';
+import type { EmbeddedImage, EmbeddedRecord, EmbeddedVideo, ExtendedEmbed } from '../utils/embed.ts';
 
 import FeedPost from '../components/FeedPost.tsx';
 import Page from '../components/Page.tsx';
 import PermalinkPost from '../components/PermalinkPost.tsx';
 import ReplyTree from '../components/ReplyTree.tsx';
-
-interface ThreadPageProps {
-	rkey: string;
-	post: AppBskyFeedPost.Record;
-}
 
 const MAX_ANCESTORS = 6;
 
@@ -37,59 +34,57 @@ const enum ExternalReply {
 	YES,
 }
 
-export function ThreadPage({ rkey, post }: ThreadPageProps) {
-	const ctx = get_page_context();
+export function ThreadPage(uri: At.Uri, post: AppBskyFeedPost.Record, ctx: ContextMap, graph: PostGraphMap, posts: AllPostsMap, path: string) {
+    const did = get_repo_id(uri) as At.DID
+    const archive = ctx.get(did) as ContextData
 
+    let top_uri = uri;
 	let top_post = post;
-	let top_rkey = rkey;
 
-	let ancestors: [rkey: string, post: AppBskyFeedPost.Record][] = [];
-	let children: [rkey: string, post: AppBskyFeedPost.Record][] = [];
+	let ancestors: [uri: At.Uri, post: AppBskyFeedPost.Record][] = [];
+	let children: [uri: At.Uri, post: AppBskyFeedPost.Record][] = [];
 
 	let reply_state = ExternalReply.NO;
-	let root_rkey: string | undefined;
+	let root_uri: At.Uri | undefined;
 	let is_ancestor_overflowing = false;
 
 	{
-		const graph = ctx.post_graph;
-
-		const entry = graph.get(rkey);
+		const entry = graph.get(uri);
 		if (entry !== undefined) {
-			const posts = ctx.records.posts;
-
 			// Collect children replies to this post
+            // const posts = archive.records.posts
 			{
 				const descendants = entry.descendants;
 
 				for (let i = 0, ilen = descendants.length; i < ilen; i++) {
-					const child_rkey = descendants[i];
-					const child_post = posts.get(child_rkey);
+					const child_uri = descendants[i];
+					const child_post = posts.get(child_uri);
 
 					if (child_post !== undefined) {
-						children.push([child_rkey, child_post]);
+						children.push([child_uri, child_post]);
 					}
 				}
 			}
 
 			// Collect parent replies to this post
 			{
-				let parent_rkey: string | null | undefined = entry.ancestor;
+				let parent_uri: string | null | undefined = entry.ancestor;
 				let count = 0;
 
-				while (parent_rkey != null && !is_ancestor_overflowing) {
-					const parent_post = posts.get(parent_rkey);
+				while (parent_uri != null && !is_ancestor_overflowing) {
+					const parent_post = posts.get(parent_uri);
 					if (parent_post === undefined) {
 						break;
 					}
 
-					top_rkey = parent_rkey;
+					top_uri = parent_uri;
 					top_post = parent_post;
 					is_ancestor_overflowing = ++count >= MAX_ANCESTORS;
 
-					ancestors.unshift([parent_rkey, parent_post]);
+					ancestors.unshift([parent_uri, parent_post]);
 
-					const parent_entry = graph.get(parent_rkey);
-					parent_rkey = parent_entry?.ancestor;
+					const parent_entry = graph.get(parent_uri);
+					parent_uri = parent_entry?.ancestor;
 				}
 			}
 		}
@@ -100,29 +95,26 @@ export function ThreadPage({ rkey, post }: ThreadPageProps) {
 		const reply = top_post.reply;
 
 		if (reply !== undefined) {
-			const our_did = ctx.profile.did;
-
 			{
 				const parent_uri = reply.parent.uri;
 				const repo = get_repo_id(parent_uri);
 
-				reply_state = repo === our_did ? ExternalReply.SAME_USER : ExternalReply.YES;
+                reply_state = ctx.has(repo) ? ExternalReply.SAME_USER : ExternalReply.YES;
 			}
 
 			{
-				const root_uri = reply.root.uri;
-				const repo = get_repo_id(root_uri) as At.DID;
-				const rkey = get_record_key(root_uri);
+				const reply_root_uri = reply.root.uri;
+				const repo = get_repo_id(reply_root_uri);
 
-				if (repo === our_did && ctx.records.posts.has(rkey)) {
-					root_rkey = rkey;
-				}
+                if (ctx.has(repo) && graph.has(reply_root_uri)) {
+                    root_uri = reply_root_uri;
+                }
 			}
 		}
 	}
 
 	return (
-		<Page title={get_title(ctx, post)} head={get_embed_head(ctx, post)}>
+		<Page title={get_title(archive.profile, post)} head={get_embed_head(archive, post, path)} ctx={ctx} path={path}>
 			{ancestors.length > 0 || reply_state !== ExternalReply.NO ? (
 				<details class="ThreadAncestors">
 					<summary class="Interactive ThreadAncestors__header">
@@ -141,7 +133,7 @@ export function ThreadPage({ rkey, post }: ThreadPageProps) {
 								</div>
 								<div class="ThreadCut__main">
 									{is_ancestor_overflowing ? (
-										<a href={get_post_url(top_rkey)} class="Link">
+										<a href={get_post_url(top_uri, ctx, path)} class="Link">
 											View parent reply
 										</a>
 									) : (
@@ -155,7 +147,7 @@ export function ThreadPage({ rkey, post }: ThreadPageProps) {
 											<div class="ThreadCut__actions">
 												{reply_state !== ExternalReply.SAME_USER ? (
 													<a
-														href={get_bsky_app_url(`at://${ctx.profile.did}/app.bsky.feed.post/${top_rkey}`)}
+														href={get_bsky_app_url(top_uri)}
 														target="_blank"
 														class="Link"
 													>
@@ -163,14 +155,14 @@ export function ThreadPage({ rkey, post }: ThreadPageProps) {
 													</a>
 												) : null}
 
-												{reply_state !== ExternalReply.SAME_USER && root_rkey ? (
+												{reply_state !== ExternalReply.SAME_USER && root_uri ? (
 													<span aria-hidden="true" class="ThreadCut__actionSeparator">
 														|
 													</span>
 												) : null}
 
-												{root_rkey ? (
-													<a href={get_post_url(root_rkey)} class="Link">
+												{root_uri ? (
+													<a href={get_post_url(root_uri, ctx, path)} class="Link">
 														view root post
 													</a>
 												) : null}
@@ -181,44 +173,56 @@ export function ThreadPage({ rkey, post }: ThreadPageProps) {
 							</div>
 						) : null}
 
-						{repeat(ancestors, ([parent_rkey, parent_post]) => (
+						{repeat(ancestors, ([parent_uri, parent_post]) => (
 							<FeedPost
-								rkey={parent_rkey}
+								uri={parent_uri}
 								post={parent_post}
 								always_show_replies={false}
 								has_prev={true}
 								has_next={true}
+                                ctx={ctx}
+                                path={path}
+                                graph={graph}
 							/>
 						))}
 					</div>
 				</details>
 			) : null}
 
-			<PermalinkPost post={post} />
+			<PermalinkPost post={post} ctx={ctx} archive={archive} path={path} />
 
 			<hr />
 
 			<div class="ThreadPage__descendants">
-				{repeat(children, ([child_rkey, child_post]) => (
-					<ReplyTree rkey={child_rkey} post={child_post} depth={0} has_next={false} />
+				{repeat(children, ([child_uri, child_post]) => (
+					<ReplyTree
+                        uri={child_uri}
+                        post={child_post}
+                        depth={0}
+                        has_next={false}
+                        ctx={ctx}
+                        archive={archive}
+                        path={path}
+                        graph={graph}
+                        posts={posts}
+                    />
 				))}
 			</div>
 		</Page>
 	);
 }
 
-function get_title(ctx: PageContext, post: AppBskyFeedPost.Record): string {
-	const author = ctx.profile;
+function get_title(author: AppBskyActorDefs.ProfileViewBasic, post: AppBskyFeedPost.Record): string {
 	return `${author.displayName || `@${author.handle}`}: "${post.text}"`;
 }
 
-function get_embed_head(ctx: PageContext, post: AppBskyFeedPost.Record): JSXNode {
+function get_embed_head(archive: ContextData, post: AppBskyFeedPost.Record, path: string): JSXNode {
 	const nodes: JSXNode = [];
 
-	const embed = post.embed;
+	const embed = post.embed as ExtendedEmbed;
 	const reply = post.reply;
 
-	const profile = ctx.profile;
+    const profile = archive.profile
 	const title = profile.displayName ? `${profile.displayName} (@${profile.handle})` : profile.handle;
 
 	let header = '';
@@ -240,24 +244,31 @@ function get_embed_head(ctx: PageContext, post: AppBskyFeedPost.Record): JSXNode
 
 		let images: EmbeddedImage[] | undefined;
 		let record: EmbeddedRecord | undefined;
+        let video: EmbeddedVideo | undefined;
 
 		if ($type === 'app.bsky.embed.images') {
 			images = embed.images;
-		} else if ($type === 'app.bsky.embed.record') {
+        } else if ($type === 'app.bsky.embed.video') {
+			video = embed;
+        } else if ($type === 'app.bsky.embed.record') {
 			record = embed.record;
 		} else if ($type === 'app.bsky.embed.recordWithMedia') {
-			const media = embed.media;
+			const media = embed.media as ExtendedEmbed;
 
 			record = embed.record.record;
 
 			if (media.$type === 'app.bsky.embed.images') {
 				images = images;
 			}
+
+            if (media.$type === 'app.bsky.embed.video') {
+                video = media;
+            }
 		}
 
 		if (images !== undefined) {
 			const img = images[0];
-			const url = get_blob_url(get_blob_str(img.image));
+			const url = get_blob_url(get_blob_str(img.image), archive, path);
 
 			nodes.push(
 				<>
@@ -266,6 +277,17 @@ function get_embed_head(ctx: PageContext, post: AppBskyFeedPost.Record): JSXNode
 				</>,
 			);
 		}
+
+        if (video !== undefined) {
+            const url = get_blob_url(get_blob_str(video.video), archive, path)
+
+            nodes.push(
+                <>
+                    <meta name="twitter:card" content="player" />
+                    <meta property="og:video" content={url} />
+                </>,
+            );
+        }
 
 		if (record !== undefined) {
 			const uri = record.uri;

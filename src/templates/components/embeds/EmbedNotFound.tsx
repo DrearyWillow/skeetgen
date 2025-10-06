@@ -1,10 +1,12 @@
 import type { At } from '@mary/bluesky-client/lexicons';
 
-import { get_page_context } from '../../context.ts';
+// import { get_page_context } from '../../context.ts';
 import { get_bsky_app_url, get_collection_ns, get_repo_id } from '../../utils/url.ts';
+import type { ContextMap } from '../../context.ts';
 
 export interface EmbedNotFoundProps {
 	uri: string;
+    ctx: ContextMap;
 }
 
 const COLLECTION_LABELS: Record<string, string> = {
@@ -13,8 +15,8 @@ const COLLECTION_LABELS: Record<string, string> = {
 	'app.bsky.graph.list': 'list',
 };
 
-function EmbedNotFound({ uri }: EmbedNotFoundProps) {
-	const ctx = get_page_context();
+function EmbedNotFound({ uri, ctx }: EmbedNotFoundProps) {
+	// const ctx = get_page_context();
 
 	const repo = get_repo_id(uri) as At.DID;
 	const ns = get_collection_ns(uri);
@@ -23,7 +25,7 @@ function EmbedNotFound({ uri }: EmbedNotFoundProps) {
 
 	return (
 		<div class="EmbedNotFound">
-			{repo === ctx.profile.did ? (
+			{repo === ctx.get(repo)?.profile.did ? (
 				<p class="EmbedNotFound__self">This {ns_label} may have been deleted</p>
 			) : (
 				<>

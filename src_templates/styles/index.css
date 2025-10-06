@@ -7,6 +7,7 @@
 @import './components/embeds/EmbedList.css';
 @import './components/embeds/EmbedNotFound.css';
 @import './components/embeds/EmbedPost.css';
+@import './components/embeds/EmbedVideo.css';
 @import './components/Embed.css';
 @import './components/FeedPost.css';
 @import './components/PermalinkPost.css';
@@ -17,3 +18,4 @@
 @import './pages/ThreadPage.css';
 @import './pages/TimelinePage.css';
 @import './pages/WelcomePage.css';
+@import './pages/AltTextOverlay.css';

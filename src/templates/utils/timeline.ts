@@ -1,12 +1,13 @@
 import type { AppBskyFeedPost, At } from '@mary/bluesky-client/lexicons';
+// import { uri_to_postref } from './url';
 
-import { get_page_context } from '../context.ts';
+// import { get_page_context } from '../context.ts';
 
 export type PostTuple = [rkey: string, post: AppBskyFeedPost.Record];
 
 export interface TimelineItem {
 	uri: At.Uri;
-	rkey: string;
+	// postref: string;
 	post: AppBskyFeedPost.Record;
 }
 
@@ -30,18 +31,15 @@ function is_first_in_slice(slice: TimelineSlice, item: TimelineItem) {
 }
 
 export function create_timeline_slices(arr: PostTuple[]) {
-	const ctx = get_page_context();
-	const did = ctx.profile.did;
-
 	const slices: TimelineSlice[] = [];
 	let jlen = 0;
 
 	loop: for (let i = arr.length - 1; i >= 0; i--) {
-		const [rkey, post] = arr[i];
+		const [uri, post] = arr[i];
 
 		const item: TimelineItem = {
-			uri: `at://${did}/app.bsky.feed.post/${rkey}`,
-			rkey: rkey,
+			uri: uri,
+            // postref: uri_to_postref(uri),
 			post: post,
 		};
 

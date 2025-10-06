@@ -1,6 +1,5 @@
 import { repeat } from '@intrnl/jsx-to-string';
 
-import { get_page_context } from '../context.ts';
 import { get_relative_url } from '../utils/url.ts';
 
 import { create_pagination } from '../utils/pagination.ts';
@@ -8,6 +7,8 @@ import { create_timeline_slices, type PostTuple } from '../utils/timeline.ts';
 
 import FeedPost from '../components/FeedPost.tsx';
 import Page from '../components/Page.tsx';
+import type { ContextMap } from '../context.ts';
+import type { PostGraphMap } from '../utils/posts.ts';
 
 type FilterType = 'posts' | 'with_replies' | 'media';
 
@@ -16,6 +17,9 @@ export interface TimelinePageProps {
 	current_page: number;
 	total_pages: number;
 	posts: PostTuple[];
+    ctx: ContextMap;
+    path: string;
+    graph: PostGraphMap;
 }
 
 const TYPE_LABELS: Record<string, string> = {
@@ -24,8 +28,7 @@ const TYPE_LABELS: Record<string, string> = {
 	media: 'Media',
 };
 
-export function TimelinePage({ type, current_page, total_pages, posts }: TimelinePageProps) {
-	const ctx = get_page_context();
+export function TimelinePage({ type, current_page, total_pages, posts, ctx, path, graph }: TimelinePageProps) {
 
 	const label = TYPE_LABELS[type] ?? type;
 	const slices = create_timeline_slices(posts);
@@ -33,11 +36,11 @@ export function TimelinePage({ type, current_page, total_pages, posts }: Timelin
 	const pagination = create_pagination(current_page, total_pages);
 
 	return (
-		<Page title={`@${ctx.profile.handle}'s timeline - ${label} (page ${current_page + 1})`}>
+		<Page title={`Timeline - ${label} (page ${current_page})`} ctx={ctx} path={path}>
 			<div class="Filters">
-				<FilterButton type="posts" active={type === 'posts'} />
-				<FilterButton type="with_replies" active={type === 'with_replies'} />
-				<FilterButton type="media" active={type === 'media'} />
+				<FilterButton type="posts" active={type === 'posts'} path={path} />
+				<FilterButton type="with_replies" active={type === 'with_replies'} path={path} />
+				<FilterButton type="media" active={type === 'media'} path={path} />
 			</div>
 
 			<div class="TimelinePage__feed">
@@ -49,11 +52,14 @@ export function TimelinePage({ type, current_page, total_pages, posts }: Timelin
 							{repeat(slice.items, (item, idx, arr) => {
 								return (
 									<FeedPost
-										rkey={item.rkey}
+										uri={item.uri}
 										post={item.post}
 										has_prev={idx !== 0}
 										has_next={idx !== arr.length - 1}
 										always_show_replies={true}
+                                        ctx={ctx}
+                                        path={path}
+                                        graph={graph}
 									/>
 								);
 							})}
@@ -68,7 +74,7 @@ export function TimelinePage({ type, current_page, total_pages, posts }: Timelin
 						return (
 							<a
 								aria-label={`Go to page ${val}`}
-								href={get_relative_url(`/timeline/${type}/${val}.html`)}
+								href={get_relative_url(`/timeline/${type}/${val}.html`, path)}
 								class={
 									'Interactive TimelinePage__page Interactive--primary' +
 									(val === current_page ? ' TimelinePage__page--active' : '')
@@ -85,7 +91,7 @@ export function TimelinePage({ type, current_page, total_pages, posts }: Timelin
 						return (
 							<a
 								title={!disabled ? `Go to previous page` : undefined}
-								href={!disabled ? get_relative_url(`/timeline/${type}/${current_page - 1}.html`) : undefined}
+								href={!disabled ? get_relative_url(`/timeline/${type}/${current_page - 1}.html`, path) : undefined}
 								class={
 									'TimelinePage__page' +
 									(!disabled ? ' Interactive Interactive--primary' : ' TimelinePage__page--disabled')
@@ -104,7 +110,7 @@ export function TimelinePage({ type, current_page, total_pages, posts }: Timelin
 						return (
 							<a
 								title={!disabled ? `Go to next page` : undefined}
-								href={!disabled ? get_relative_url(`/timeline/${type}/${current_page + 1}.html`) : undefined}
+								href={!disabled ? get_relative_url(`/timeline/${type}/${current_page + 1}.html`, path) : undefined}
 								class={
 									'TimelinePage__page' +
 									(!disabled ? ' Interactive Interactive--primary' : ' TimelinePage__page--disabled')
@@ -140,12 +146,13 @@ export function TimelinePage({ type, current_page, total_pages, posts }: Timelin
 interface FilterButtonProps {
 	type: FilterType;
 	active: boolean;
+    path: string;
 }
 
-function FilterButton({ active, type }: FilterButtonProps) {
+function FilterButton({ active, type, path }: FilterButtonProps) {
 	return (
 		<a
-			href={get_relative_url(`/timeline/${type}/1.html`)}
+			href={get_relative_url(`/timeline/${type}/1.html`, path)}
 			class={'Interactive Interactive--primary Filter' + (active ? ' Filter--active' : '')}
 		>
 			{TYPE_LABELS[type] ?? type}
