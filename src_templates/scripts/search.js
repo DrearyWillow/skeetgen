@@ -46,7 +46,7 @@ const index = new FlexSearch.Document({
 	const HAS_EMBED_RECORD = 1 << 2;
 	const HAS_EMBED_FEED = 1 << 3;
 	const HAS_EMBED_LIST = 1 << 4;
-    const HAS_EMBED_VIDEO = 1 << 5;
+	const HAS_EMBED_VIDEO = 1 << 5;
 
 	const SORT_RELEVANT = 'relevant';
 	const SORT_NEW = 'new';
@@ -128,10 +128,10 @@ const index = new FlexSearch.Document({
 	}
 
 	function render_search_item({ item }) {
-        const [postref, post_text, ts, flags, alt, profile] = item;
+		const [postref, post_text, ts, flags, alt, profile] = item;
 
 		return h('div', { class: 'SearchItem__content' }, [
-            h('p', { class: 'SearchItem__displayName'}, text(`@${profile.handle}`)),
+			h('p', { class: 'SearchItem__displayName' }, text(`@${profile.handle}`)),
 			h('a', { href: `posts/${postref}.html`, class: 'SearchItem__timestamp' }, [
 				text(ts === 0 ? 'N/A' : abs_with_time.format(ts)),
 			]),

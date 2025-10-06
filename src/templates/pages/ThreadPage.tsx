@@ -34,11 +34,18 @@ const enum ExternalReply {
 	YES,
 }
 
-export function ThreadPage(uri: At.Uri, post: AppBskyFeedPost.Record, ctx: ContextMap, graph: PostGraphMap, posts: AllPostsMap, path: string) {
-    const did = get_repo_id(uri) as At.DID
-    const archive = ctx.get(did) as ContextData
+export function ThreadPage(
+	uri: At.Uri,
+	post: AppBskyFeedPost.Record,
+	ctx: ContextMap,
+	graph: PostGraphMap,
+	posts: AllPostsMap,
+	path: string,
+) {
+	const did = get_repo_id(uri) as At.DID;
+	const archive = ctx.get(did) as ContextData;
 
-    let top_uri = uri;
+	let top_uri = uri;
 	let top_post = post;
 
 	let ancestors: [uri: At.Uri, post: AppBskyFeedPost.Record][] = [];
@@ -52,7 +59,7 @@ export function ThreadPage(uri: At.Uri, post: AppBskyFeedPost.Record, ctx: Conte
 		const entry = graph.get(uri);
 		if (entry !== undefined) {
 			// Collect children replies to this post
-            // const posts = archive.records.posts
+			// const posts = archive.records.posts
 			{
 				const descendants = entry.descendants;
 
@@ -99,22 +106,27 @@ export function ThreadPage(uri: At.Uri, post: AppBskyFeedPost.Record, ctx: Conte
 				const parent_uri = reply.parent.uri;
 				const repo = get_repo_id(parent_uri);
 
-                reply_state = ctx.has(repo) ? ExternalReply.SAME_USER : ExternalReply.YES;
+				reply_state = ctx.has(repo) ? ExternalReply.SAME_USER : ExternalReply.YES;
 			}
 
 			{
 				const reply_root_uri = reply.root.uri;
 				const repo = get_repo_id(reply_root_uri);
 
-                if (ctx.has(repo) && graph.has(reply_root_uri)) {
-                    root_uri = reply_root_uri;
-                }
+				if (ctx.has(repo) && graph.has(reply_root_uri)) {
+					root_uri = reply_root_uri;
+				}
 			}
 		}
 	}
 
 	return (
-		<Page title={get_title(archive.profile, post)} head={get_embed_head(archive, post, path)} ctx={ctx} path={path}>
+		<Page
+			title={get_title(archive.profile, post)}
+			head={get_embed_head(archive, post, path)}
+			ctx={ctx}
+			path={path}
+		>
 			{ancestors.length > 0 || reply_state !== ExternalReply.NO ? (
 				<details class="ThreadAncestors">
 					<summary class="Interactive ThreadAncestors__header">
@@ -146,11 +158,7 @@ export function ThreadPage(uri: At.Uri, post: AppBskyFeedPost.Record, ctx: Conte
 
 											<div class="ThreadCut__actions">
 												{reply_state !== ExternalReply.SAME_USER ? (
-													<a
-														href={get_bsky_app_url(top_uri)}
-														target="_blank"
-														class="Link"
-													>
+													<a href={get_bsky_app_url(top_uri)} target="_blank" class="Link">
 														view in bsky.app
 													</a>
 												) : null}
@@ -180,9 +188,9 @@ export function ThreadPage(uri: At.Uri, post: AppBskyFeedPost.Record, ctx: Conte
 								always_show_replies={false}
 								has_prev={true}
 								has_next={true}
-                                ctx={ctx}
-                                path={path}
-                                graph={graph}
+								ctx={ctx}
+								path={path}
+								graph={graph}
 							/>
 						))}
 					</div>
@@ -196,16 +204,16 @@ export function ThreadPage(uri: At.Uri, post: AppBskyFeedPost.Record, ctx: Conte
 			<div class="ThreadPage__descendants">
 				{repeat(children, ([child_uri, child_post]) => (
 					<ReplyTree
-                        uri={child_uri}
-                        post={child_post}
-                        depth={0}
-                        has_next={false}
-                        ctx={ctx}
-                        archive={archive}
-                        path={path}
-                        graph={graph}
-                        posts={posts}
-                    />
+						uri={child_uri}
+						post={child_post}
+						depth={0}
+						has_next={false}
+						ctx={ctx}
+						archive={archive}
+						path={path}
+						graph={graph}
+						posts={posts}
+					/>
 				))}
 			</div>
 		</Page>
@@ -222,7 +230,7 @@ function get_embed_head(archive: ContextData, post: AppBskyFeedPost.Record, path
 	const embed = post.embed as ExtendedEmbed;
 	const reply = post.reply;
 
-    const profile = archive.profile
+	const profile = archive.profile;
 	const title = profile.displayName ? `${profile.displayName} (@${profile.handle})` : profile.handle;
 
 	let header = '';
@@ -244,13 +252,13 @@ function get_embed_head(archive: ContextData, post: AppBskyFeedPost.Record, path
 
 		let images: EmbeddedImage[] | undefined;
 		let record: EmbeddedRecord | undefined;
-        let video: EmbeddedVideo | undefined;
+		let video: EmbeddedVideo | undefined;
 
 		if ($type === 'app.bsky.embed.images') {
 			images = embed.images;
-        } else if ($type === 'app.bsky.embed.video') {
+		} else if ($type === 'app.bsky.embed.video') {
 			video = embed;
-        } else if ($type === 'app.bsky.embed.record') {
+		} else if ($type === 'app.bsky.embed.record') {
 			record = embed.record;
 		} else if ($type === 'app.bsky.embed.recordWithMedia') {
 			const media = embed.media as ExtendedEmbed;
@@ -261,9 +269,9 @@ function get_embed_head(archive: ContextData, post: AppBskyFeedPost.Record, path
 				images = images;
 			}
 
-            if (media.$type === 'app.bsky.embed.video') {
-                video = media;
-            }
+			if (media.$type === 'app.bsky.embed.video') {
+				video = media;
+			}
 		}
 
 		if (images !== undefined) {
@@ -278,16 +286,16 @@ function get_embed_head(archive: ContextData, post: AppBskyFeedPost.Record, path
 			);
 		}
 
-        if (video !== undefined) {
-            const url = get_blob_url(get_blob_str(video.video), archive, path)
+		if (video !== undefined) {
+			const url = get_blob_url(get_blob_str(video.video), archive, path);
 
-            nodes.push(
-                <>
-                    <meta name="twitter:card" content="player" />
-                    <meta property="og:video" content={url} />
-                </>,
-            );
-        }
+			nodes.push(
+				<>
+					<meta name="twitter:card" content="player" />
+					<meta property="og:video" content={url} />
+				</>,
+			);
+		}
 
 		if (record !== undefined) {
 			const uri = record.uri;

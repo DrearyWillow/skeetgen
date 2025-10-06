@@ -14,9 +14,9 @@ export interface ReplyPostProps {
 	post: AppBskyFeedPost.Record;
 	has_children: boolean;
 	has_parent: boolean;
-    ctx: ContextMap;
-    archive: ContextData;
-    path: string;
+	ctx: ContextMap;
+	archive: ContextData;
+	path: string;
 }
 
 function ReplyPost({ uri, post, has_children, has_parent, ctx, archive, path }: ReplyPostProps) {
@@ -27,7 +27,11 @@ function ReplyPost({ uri, post, has_children, has_parent, ctx, archive, path }: 
 			<div class="ReplyPost__aside">
 				<div class="ReplyPost__avatarContainer">
 					{archive.profile.avatar ? (
-						<img loading="lazy" src={get_blob_url(archive.profile.avatar, archive, path)} class="ReplyPost__avatar" />
+						<img
+							loading="lazy"
+							src={get_blob_url(archive.profile.avatar, archive, path)}
+							class="ReplyPost__avatar"
+						/>
 					) : null}
 				</div>
 
@@ -64,7 +68,9 @@ function ReplyPost({ uri, post, has_children, has_parent, ctx, archive, path }: 
 					<RichTextRenderer text={post.text} facets={post.facets} />
 				</div>
 
-				{post.embed ? <Embed embed={post.embed} large={false} archive={archive} ctx={ctx} path={path} /> : null}
+				{post.embed ? (
+					<Embed embed={post.embed} large={false} archive={archive} ctx={ctx} path={path} />
+				) : null}
 			</div>
 		</div>
 	);

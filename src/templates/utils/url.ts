@@ -66,7 +66,7 @@ export function get_relative_url(url: string, path: string) {
 }
 
 export function get_asset_url(asset: string, ctx: ContextMap, path: string) {
-    const asset_dir = ctx.values().next().value?.asset_dir ?? `/assets`;
+	const asset_dir = ctx.values().next().value?.asset_dir ?? `/assets`;
 	return get_relative_url(join_path(asset_dir, asset), path);
 }
 
@@ -77,37 +77,37 @@ export function get_blob_url(cid: string, archive: ContextData, path: string) {
 }
 
 export function get_post_url(uri: At.Uri, ctx: ContextMap, path: string) {
-    const did = get_repo_id(uri) as At.DID;
-    const archive = ctx.get(did) as ContextData;
-    const segment = get_tid_segment(get_record_key(uri))
+	const did = get_repo_id(uri) as At.DID;
+	const archive = ctx.get(did) as ContextData;
+	const segment = get_tid_segment(get_record_key(uri));
 
-    // probably over-engineered and i don't need ctx,
-    // you can get the postref from uri and assume /posts from there, but w/e
+	// probably over-engineered and i don't need ctx,
+	// you can get the postref from uri and assume /posts from there, but w/e
 	return get_relative_url(join_path(archive.posts_dir, `${segment}.html`), path);
 }
 
 export function make_bsky_post_aturi(did: At.DID, rkey: string) {
-    return `at://${did}/app.bsky.feed.post/${rkey}`
+	return `at://${did}/app.bsky.feed.post/${rkey}`;
 }
 
 export function sanitize_did(did: At.DID) {
-    return did.replaceAll(":", "_")
+	return did.replaceAll(':', '_');
 }
 
 export function postref_to_uri(postref: string) {
-    const parts = postref.split("/");
-    const did = parts.shift()?.replace("_", ":") as At.DID;
-    const rkey = parts.join("");
+	const parts = postref.split('/');
+	const did = parts.shift()?.replace('_', ':') as At.DID;
+	const rkey = parts.join('');
 
-    return make_bsky_post_aturi(did, rkey)
+	return make_bsky_post_aturi(did, rkey);
 }
 
 export function uri_to_postref(uri: At.Uri) {
-    const rkey = get_record_key(uri)
-    const segment = get_tid_segment(rkey)
+	const rkey = get_record_key(uri);
+	const segment = get_tid_segment(rkey);
 
-    const did = get_repo_id(uri) as At.DID
-    const sanitized_did = sanitize_did(did)
+	const did = get_repo_id(uri) as At.DID;
+	const sanitized_did = sanitize_did(did);
 
-    return `${sanitized_did}/${segment}`
+	return `${sanitized_did}/${segment}`;
 }

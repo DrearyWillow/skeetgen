@@ -1,11 +1,11 @@
 import type { TrustedHTML } from '@intrnl/jsx-to-string';
 
 import type {
-    AppBskyActorDefs,
-    AppBskyFeedGenerator,
-    AppBskyFeedPost,
-    AppBskyFeedThreadgate,
-    AppBskyGraphList,
+	AppBskyActorDefs,
+	AppBskyFeedGenerator,
+	AppBskyFeedPost,
+	AppBskyFeedThreadgate,
+	AppBskyGraphList,
 	// AppBskyActorDefs,
 	// AppBskyFeedGenerator,
 	// AppBskyFeedPost,
@@ -17,26 +17,26 @@ import type {
 import { CID } from 'multiformats/cid';
 
 export interface ContextData {
-    posts_dir: string;
-    blob_dir: string;
-    asset_dir: string;
+	posts_dir: string;
+	blob_dir: string;
+	asset_dir: string;
 
-    records: {
-        feeds: Map<string, AppBskyFeedGenerator.Record>;
-        lists: Map<string, AppBskyGraphList.Record>;
-        posts: Map<string, AppBskyFeedPost.Record>;
-        threadgates: Map<string, AppBskyFeedThreadgate.Record>;
-    };
+	records: {
+		feeds: Map<string, AppBskyFeedGenerator.Record>;
+		lists: Map<string, AppBskyGraphList.Record>;
+		posts: Map<string, AppBskyFeedPost.Record>;
+		threadgates: Map<string, AppBskyFeedThreadgate.Record>;
+	};
 
-    profile: AppBskyActorDefs.ProfileViewBasic;
+	profile: AppBskyActorDefs.ProfileViewBasic;
 
-    archive: Blob;
+	archive: Blob;
 }
 
 export type ContextMap = Map<At.DID, ContextData>;
 
 export function render_page(page: TrustedHTML): string {
-	return '<!doctype html>' + page.value
+	return '<!doctype html>' + page.value;
 }
 
 export function get_blob_str(blob: At.Blob) {
@@ -88,8 +88,6 @@ export function is_did(str: At.DID): str is At.DID {
 // 	render: () => TrustedHTML;
 // }
 
-
-
 // export function render_page({ context, render }: RenderPageOptions): string {
 // 	const prev_context = curr_context;
 
@@ -104,4 +102,3 @@ export function is_did(str: At.DID): str is At.DID {
 // export function get_page_context(): PageContext {
 // 	return curr_context!;
 // }
-

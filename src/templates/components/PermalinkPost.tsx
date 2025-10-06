@@ -13,9 +13,9 @@ import type { ContextData } from '../context.ts';
 
 interface PermalinkPostProps {
 	post: AppBskyFeedPost.Record;
-    ctx: ContextMap;
-    archive: ContextData;
-    path: string;
+	ctx: ContextMap;
+	archive: ContextData;
+	path: string;
 }
 
 function PermalinkPost({ post, ctx, archive, path }: PermalinkPostProps) {
@@ -26,7 +26,11 @@ function PermalinkPost({ post, ctx, archive, path }: PermalinkPostProps) {
 			<div class="PermalinkPost__header">
 				<div class="PermalinkPost__avatarContainer">
 					{archive.profile.avatar ? (
-						<img loading="lazy" src={get_blob_url(archive.profile.avatar, archive, path)} class="PermalinkPost__avatar" />
+						<img
+							loading="lazy"
+							src={get_blob_url(archive.profile.avatar, archive, path)}
+							class="PermalinkPost__avatar"
+						/>
 					) : null}
 				</div>
 

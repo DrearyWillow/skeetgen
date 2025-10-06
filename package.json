@@ -16,7 +16,7 @@
 			"dependencies": [
 				"gen:archive_css",
 				"gen:archive_search_js",
-                "gen:archive_alt_text_js"
+				"gen:archive_alt_text_js"
 			]
 		},
 		"gen:archive_css": {
@@ -38,15 +38,15 @@
 				"public/archive_assets/search.js"
 			]
 		},
-        "gen:archive_alt_text_js": {
-            "command": "esbuild src_templates/scripts/alt-text-overlay.js --bundle --format=iife --outfile=public/archive_assets/alt-text-overlay.js --minify-syntax --minify-whitespace",
-            "files": [
-            "src_templates/scripts/alt-text-overlay.js"
-            ],
-            "output": [
-            "public/archive_assets/alt-text-overlay.js"
-            ]
-        }
+		"gen:archive_alt_text_js": {
+			"command": "esbuild src_templates/scripts/alt-text-overlay.js --bundle --format=iife --outfile=public/archive_assets/alt-text-overlay.js --minify-syntax --minify-whitespace",
+			"files": [
+				"src_templates/scripts/alt-text-overlay.js"
+			],
+			"output": [
+				"public/archive_assets/alt-text-overlay.js"
+			]
+		}
 	},
 	"dependencies": {
 		"@akryum/flexsearch-es": "^0.7.32",

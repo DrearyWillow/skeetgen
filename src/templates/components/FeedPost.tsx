@@ -19,17 +19,17 @@ export interface FeedPost {
 	has_prev: boolean;
 	/** Draw a line connecting this post to the next */
 	has_next: boolean;
-    ctx: ContextMap;
-    path: string;
-    graph: PostGraphMap;
+	ctx: ContextMap;
+	path: string;
+	graph: PostGraphMap;
 }
 
 function FeedPost({ uri, post, always_show_replies, has_prev, has_next, ctx, path, graph }: FeedPost) {
 	// const href = get_post_url(postref, ctx, path);
-    const href = get_post_url(uri, ctx, path)
+	const href = get_post_url(uri, ctx, path);
 
-    // const uri = postref_to_uri(postref);
-    const archive = ctx.get(get_repo_id(uri) as At.DID) as ContextData
+	// const uri = postref_to_uri(postref);
+	const archive = ctx.get(get_repo_id(uri) as At.DID) as ContextData;
 
 	let reply_count = 0;
 	{
@@ -56,7 +56,11 @@ function FeedPost({ uri, post, always_show_replies, has_prev, has_next, ctx, pat
 				<div class="FeedPost__aside">
 					<div class="FeedPost__avatarContainer">
 						{archive.profile.avatar ? (
-							<img loading="lazy" src={get_blob_url(archive.profile.avatar, archive, path)} class="FeedPost__avatar" />
+							<img
+								loading="lazy"
+								src={get_blob_url(archive.profile.avatar, archive, path)}
+								class="FeedPost__avatar"
+							/>
 						) : null}
 					</div>
 
@@ -88,7 +92,9 @@ function FeedPost({ uri, post, always_show_replies, has_prev, has_next, ctx, pat
 						<RichTextRenderer text={post.text} facets={post.facets} />
 					</div>
 
-					{post.embed ? <Embed embed={post.embed} large={false} ctx={ctx} path={path} archive={archive} /> : null}
+					{post.embed ? (
+						<Embed embed={post.embed} large={false} ctx={ctx} path={path} archive={archive} />
+					) : null}
 
 					{reply_count > (always_show_replies ? 0 : 1) && (
 						<a href={href} class="Link FeedPost__replies">

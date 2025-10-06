@@ -12,8 +12,8 @@ const LIST_PURPOSE_LABELS: Record<AppBskyGraphDefs.ListPurpose, string> = {
 
 export interface EmbedListProps {
 	record: AppBskyGraphList.Record;
-    archive: ContextData;
-    path: string;
+	archive: ContextData;
+	path: string;
 }
 
 function EmbedList({ record, archive, path }: EmbedListProps) {
@@ -24,7 +24,11 @@ function EmbedList({ record, archive, path }: EmbedListProps) {
 		<div class="EmbedList">
 			<div class="EmbedList__avatarContainer">
 				{record.avatar ? (
-					<img loading="lazy" src={get_blob_url(get_blob_str(record.avatar), archive, path)} class="EmbedList__avatar" />
+					<img
+						loading="lazy"
+						src={get_blob_url(get_blob_str(record.avatar), archive, path)}
+						class="EmbedList__avatar"
+					/>
 				) : null}
 			</div>
 

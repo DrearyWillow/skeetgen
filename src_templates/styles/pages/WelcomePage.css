@@ -9,7 +9,7 @@
 }
 
 .WelcomePage__list {
-	@apply mt-2 ml-4 list-disc text-pretty;
+	@apply ml-4 mt-2 list-disc text-pretty;
 }
 
 .WelcomePage__list li {

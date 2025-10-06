@@ -12,27 +12,30 @@ export interface EmbedPostProps {
 	uri: At.Uri;
 	record: AppBskyFeedPost.Record;
 	large: boolean;
-    ctx: ContextMap;
-    path: string;
+	ctx: ContextMap;
+	path: string;
 }
 
 function EmbedPost({ uri, record, large, ctx, path }: EmbedPostProps) {
-
 	const text = record.text;
 	const images = get_post_images(record);
-    const video = get_post_video(record);
+	const video = get_post_video(record);
 
-	const show_large_media = (images !== undefined || video !== undefined)  && (large || !text);
+	const show_large_media = (images !== undefined || video !== undefined) && (large || !text);
 
-    const did = get_repo_id(uri) as At.DID;
-    const archive = ctx.get(did);
+	const did = get_repo_id(uri) as At.DID;
+	const archive = ctx.get(did);
 
 	return (
 		<a href={get_post_url(uri, ctx, path)} class="EmbedPost Interactive">
 			<div class="EmbedPost__header">
 				<div class="EmbedPost__avatarContainer">
 					{archive?.profile.avatar ? (
-						<img loading="lazy" src={get_blob_url(archive.profile.avatar, archive, path)} class="EmbedPost__avatar" />
+						<img
+							loading="lazy"
+							src={get_blob_url(archive.profile.avatar, archive, path)}
+							class="EmbedPost__avatar"
+						/>
 					) : null}
 				</div>
 
@@ -57,13 +60,19 @@ function EmbedPost({ uri, record, large, ctx, path }: EmbedPostProps) {
 				<div class="EmbedPost__body">
 					{images && !large && archive ? (
 						<div class="EmbedPost__imageAside">
-							<EmbedImage images={images} is_bordered={true} allow_standalone_ratio={false} archive={archive} path={path} />
+							<EmbedImage
+								images={images}
+								is_bordered={true}
+								allow_standalone_ratio={false}
+								archive={archive}
+								path={path}
+							/>
 						</div>
 					) : video && !large && archive ? (
-                        <div class="EmbedPost__videoAside">
-                            <EmbedVideo video={video} is_bordered={true} archive={archive} path={path} />
-                        </div>
-                    ) : null}
+						<div class="EmbedPost__videoAside">
+							<EmbedVideo video={video} is_bordered={true} archive={archive} path={path} />
+						</div>
+					) : null}
 
 					<div class="EmbedPost__text">{text}</div>
 				</div>
@@ -72,14 +81,20 @@ function EmbedPost({ uri, record, large, ctx, path }: EmbedPostProps) {
 			{images && show_large_media && archive ? (
 				<>
 					{text ? <div class="EmbedPost__divider"></div> : null}
-					<EmbedImage images={images} is_bordered={false} allow_standalone_ratio={false} archive={archive} path={path} />
+					<EmbedImage
+						images={images}
+						is_bordered={false}
+						allow_standalone_ratio={false}
+						archive={archive}
+						path={path}
+					/>
 				</>
 			) : video && show_large_media && archive ? (
-                <>
+				<>
 					{text ? <div class="EmbedPost__divider"></div> : null}
 					<EmbedVideo video={video} is_bordered={false} archive={archive} path={path} />
 				</>
-            ) : null}
+			) : null}
 		</a>
 	);
 }

@@ -7,7 +7,7 @@ import type {
 	AppBskyFeedPost,
 	AppBskyFeedThreadgate,
 	AppBskyGraphList,
-    At,
+	At,
 } from '@mary/bluesky-client/lexicons';
 
 import { CarBlockIterator } from '@ipld/car';
@@ -55,9 +55,10 @@ class GenerateArchiveForm extends HTMLElement {
 			const $fsa_large_warning = this.fsa_large_warning.get()!;
 
 			$picker_input.addEventListener('input', () => {
-                const files = Array.from($picker_input.files || []);
-                $picker_label.textContent = files.length > 0 ? `${files.length} file(s) selected` : `No files selected.`;
-                $fsa_large_warning.style.display = !supports_fsa && files.some((f) => f.size > 1e7) ? '' : 'none';
+				const files = Array.from($picker_input.files || []);
+				$picker_label.textContent =
+					files.length > 0 ? `${files.length} file(s) selected` : `No files selected.`;
+				$fsa_large_warning.style.display = !supports_fsa && files.some((f) => f.size > 1e7) ? '' : 'none';
 			});
 		}
 
@@ -74,7 +75,7 @@ class GenerateArchiveForm extends HTMLElement {
 				controller = new AbortController();
 
 				const data = new FormData($form);
-                const archives = data.getAll('archive') as File[];
+				const archives = data.getAll('archive') as File[];
 				const with_media = !!data.get('with_media');
 
 				const signal = controller.signal;
@@ -132,140 +133,146 @@ class GenerateArchiveForm extends HTMLElement {
 		}
 	}
 
-    async copy_all_blobs(signal: AbortSignal, writable: FileSystemWritableFileStream, ctx: ContextMap) {
-        const $status = this.status.get()!;
-        signal.throwIfAborted();
-        $status.textContent = `Copying media files`;
+	async copy_all_blobs(signal: AbortSignal, writable: FileSystemWritableFileStream, ctx: ContextMap) {
+		const $status = this.status.get()!;
+		signal.throwIfAborted();
+		$status.textContent = `Copying media files`;
 
-        let log = true;
-        let count = 0;
+		let log = true;
+		let count = 0;
 
-        for (const [did, archive] of ctx) {
-            const stream = archive.archive.stream();
-            const reader = create_iterable_reader(iterate_stream(stream));
+		for (const [did, archive] of ctx) {
+			const stream = archive.archive.stream();
+			const reader = create_iterable_reader(iterate_stream(stream));
 
-            for await (const entry of untar(reader)) {
-                signal.throwIfAborted();
+			for await (const entry of untar(reader)) {
+				signal.throwIfAborted();
 
-                if (entry.name.startsWith('blobs/')) {
-                    const buffer = new Uint8Array(entry.size);
+				if (entry.name.startsWith('blobs/')) {
+					const buffer = new Uint8Array(entry.size);
 
-                    await entry.read(buffer);
-                    const sanitized_did = sanitize_did(did)
-                    const filename = entry.name.replace('blobs/', `blobs/${sanitized_did}/`)
-                    await writable.write(write_tar_entry({ filename: filename, data: buffer }));
+					await entry.read(buffer);
+					const sanitized_did = sanitize_did(did);
+					const filename = entry.name.replace('blobs/', `blobs/${sanitized_did}/`);
+					await writable.write(write_tar_entry({ filename: filename, data: buffer }));
 
-                    count++;
+					count++;
 
-                    if (log) {
-                        log = false;
-                        $status.textContent = `Copying media files (${count} copied)`;
+					if (log) {
+						log = false;
+						$status.textContent = `Copying media files (${count} copied)`;
 
-                        setTimeout(() => (log = true), 500);
-                    }
-                }
-            }
-        }
-    }
-
-    async render_timeline_pages(signal: AbortSignal, writable: FileSystemWritableFileStream, ctx: ContextMap, graph: PostGraphMap, posts: AllPostsMap) {
-
-        // Render timelines
-        {
-            signal.throwIfAborted();
-
-            // Collect all [uri, post] pairs into an array
-            const post_tuples = [...posts];
-
-            // Sort newest-first by createdAt
-            {
-                post_tuples.sort((a, b) => {
-                    const dateA = new Date(a[1].createdAt).getTime();
-                    const dateB = new Date(b[1].createdAt).getTime();
-
-                    const safeA = Number.isNaN(dateA) ? 0 : dateA;
-                    const safeB = Number.isNaN(dateB) ? 0 : dateB;
-
-                    return safeB - safeA;
-                })
-            }
-
-            // All posts
-            {
-                await write_timeline_pages('with_replies', post_tuples);
-            }
-
-            // Root posts only
-            {
-                const root_posts = post_tuples.filter(([, post]) => post.reply === undefined);
-                await write_timeline_pages('posts', root_posts);
-            }
-
-            // Image or video posts only
-            {
-                const media_posts = post_tuples.filter(([, post]) => {
-                    const embed = post.embed as ExtendedEmbed;
-
-                    return (
-                        embed !== undefined &&
-                        (embed.$type === 'app.bsky.embed.images' ||
-                            embed.$type === 'app.bsky.embed.video' ||
-                            (embed.$type === 'app.bsky.embed.recordWithMedia' &&
-                                (embed.media.$type === 'app.bsky.embed.images' ||
-                                    embed.media.$type === 'app.bsky.embed.video')))
-                    );
-                });
-
-                await write_timeline_pages('media', media_posts);
-            }
-        }
-
-        async function write_timeline_pages(
-            type: 'posts' | 'with_replies' | 'media',
-            tuples: [uri: string, post: AppBskyFeedPost.Record][],
-        ) {
-            const pages = chunked(tuples, 50);
-
-            // Push an empty page
-            if (pages.length === 0) {
-                pages.push([]);
-            }
-
-            for (let i = 0, ilen = pages.length; i < ilen; i++) {
-                const page = pages[i];
-
-                const path = `timeline/${type}/${i + 1}.html`
-                await writable.write(
-                    write_tar_entry({
-                        filename: path,
-                        data: render_page(TimelinePage({
-                            type: type,
-                            current_page: i + 1,
-                            total_pages: ilen,
-                            posts: page,
-                            path: `/${path}`,
-                            ctx: ctx,
-                            graph: graph
-                        })),
-                    }),
-                );
-            }
-        }
-
+						setTimeout(() => (log = true), 500);
+					}
+				}
+			}
+		}
 	}
 
-    async create_context_map(signal: AbortSignal, archives: Blob[]) {
-        let total_posts: number = 0
+	async render_timeline_pages(
+		signal: AbortSignal,
+		writable: FileSystemWritableFileStream,
+		ctx: ContextMap,
+		graph: PostGraphMap,
+		posts: AllPostsMap,
+	) {
+		// Render timelines
+		{
+			signal.throwIfAborted();
 
-        const ctx = new Map<At.DID, ContextData>();
+			// Collect all [uri, post] pairs into an array
+			const post_tuples = [...posts];
 
-        for (const archive of archives) {
-            let did: DidDocument;
-            let profile: AppBskyActorProfile.Record | undefined;
-            const feeds = new Map<string, AppBskyFeedGenerator.Record>();
-            const lists = new Map<string, AppBskyGraphList.Record>();
-            const posts = new Map<string, AppBskyFeedPost.Record>();
-            const threadgates = new Map<string, AppBskyFeedThreadgate.Record>();
+			// Sort newest-first by createdAt
+			{
+				post_tuples.sort((a, b) => {
+					const dateA = new Date(a[1].createdAt).getTime();
+					const dateB = new Date(b[1].createdAt).getTime();
+
+					const safeA = Number.isNaN(dateA) ? 0 : dateA;
+					const safeB = Number.isNaN(dateB) ? 0 : dateB;
+
+					return safeB - safeA;
+				});
+			}
+
+			// All posts
+			{
+				await write_timeline_pages('with_replies', post_tuples);
+			}
+
+			// Root posts only
+			{
+				const root_posts = post_tuples.filter(([, post]) => post.reply === undefined);
+				await write_timeline_pages('posts', root_posts);
+			}
+
+			// Image or video posts only
+			{
+				const media_posts = post_tuples.filter(([, post]) => {
+					const embed = post.embed as ExtendedEmbed;
+
+					return (
+						embed !== undefined &&
+						(embed.$type === 'app.bsky.embed.images' ||
+							embed.$type === 'app.bsky.embed.video' ||
+							(embed.$type === 'app.bsky.embed.recordWithMedia' &&
+								(embed.media.$type === 'app.bsky.embed.images' ||
+									embed.media.$type === 'app.bsky.embed.video')))
+					);
+				});
+
+				await write_timeline_pages('media', media_posts);
+			}
+		}
+
+		async function write_timeline_pages(
+			type: 'posts' | 'with_replies' | 'media',
+			tuples: [uri: string, post: AppBskyFeedPost.Record][],
+		) {
+			const pages = chunked(tuples, 50);
+
+			// Push an empty page
+			if (pages.length === 0) {
+				pages.push([]);
+			}
+
+			for (let i = 0, ilen = pages.length; i < ilen; i++) {
+				const page = pages[i];
+
+				const path = `timeline/${type}/${i + 1}.html`;
+				await writable.write(
+					write_tar_entry({
+						filename: path,
+						data: render_page(
+							TimelinePage({
+								type: type,
+								current_page: i + 1,
+								total_pages: ilen,
+								posts: page,
+								path: `/${path}`,
+								ctx: ctx,
+								graph: graph,
+							}),
+						),
+					}),
+				);
+			}
+		}
+	}
+
+	async create_context_map(signal: AbortSignal, archives: Blob[]) {
+		let total_posts: number = 0;
+
+		const ctx = new Map<At.DID, ContextData>();
+
+		for (const archive of archives) {
+			let did: DidDocument;
+			let profile: AppBskyActorProfile.Record | undefined;
+			const feeds = new Map<string, AppBskyFeedGenerator.Record>();
+			const lists = new Map<string, AppBskyGraphList.Record>();
+			const posts = new Map<string, AppBskyFeedPost.Record>();
+			const threadgates = new Map<string, AppBskyFeedThreadgate.Record>();
 			let car_buf: Uint8Array | undefined;
 			let did_buf: Uint8Array | undefined;
 
@@ -351,169 +358,173 @@ class GenerateArchiveForm extends HTMLElement {
 				}
 			}
 
-            const handles = did.alsoKnownAs?.filter((uri) => uri.startsWith('at://')).map((uri) => uri.slice(5));
-            const sanitized_did = sanitize_did(did.id as At.DID)
+			const handles = did.alsoKnownAs?.filter((uri) => uri.startsWith('at://')).map((uri) => uri.slice(5));
+			const sanitized_did = sanitize_did(did.id as At.DID);
 
-            ctx.set(did.id as At.DID, {
-                posts_dir: `/posts/${sanitized_did}`,
-                blob_dir: `/blobs/${sanitized_did}`,
-                asset_dir: `/assets`, // assets are shared
-                records: {
-                    feeds: feeds,
-                    lists: lists,
-                    posts: posts,
-                    threadgates: threadgates,
-                },
-                archive: archive,
-                profile: {
-                    did: did.id as At.DID,
-                    handle: handles && handles.length > 0 ? handles[0] : 'handle.invalid',
-                    displayName: profile?.displayName?.trim(),
-                    avatar: profile?.avatar && get_blob_str(profile?.avatar),
-                },
-            });
+			ctx.set(did.id as At.DID, {
+				posts_dir: `/posts/${sanitized_did}`,
+				blob_dir: `/blobs/${sanitized_did}`,
+				asset_dir: `/assets`, // assets are shared
+				records: {
+					feeds: feeds,
+					lists: lists,
+					posts: posts,
+					threadgates: threadgates,
+				},
+				archive: archive,
+				profile: {
+					did: did.id as At.DID,
+					handle: handles && handles.length > 0 ? handles[0] : 'handle.invalid',
+					displayName: profile?.displayName?.trim(),
+					avatar: profile?.avatar && get_blob_str(profile?.avatar),
+				},
+			});
 
-            total_posts += posts.size;
-        }
+			total_posts += posts.size;
+		}
 
-        const $status = this.status.get()!;
+		const $status = this.status.get()!;
 		$status.textContent = `Retrieved ${total_posts} posts`;
 
-        return ctx
-    }
+		return ctx;
+	}
 
-    async copy_necessary_assets(signal: AbortSignal, writable: FileSystemWritableFileStream) {
-        signal.throwIfAborted();
+	async copy_necessary_assets(signal: AbortSignal, writable: FileSystemWritableFileStream) {
+		signal.throwIfAborted();
 
-        async function get_asset(url: string, signal: AbortSignal) {
-            const response = await fetch(import.meta.env.BASE_URL + url, { signal: signal });
+		async function get_asset(url: string, signal: AbortSignal) {
+			const response = await fetch(import.meta.env.BASE_URL + url, { signal: signal });
 
-            if (!response.ok) {
-                throw new Error(`Failed to retrieve ${url}`);
-            }
+			if (!response.ok) {
+				throw new Error(`Failed to retrieve ${url}`);
+			}
 
-            const buffer = await response.arrayBuffer();
+			const buffer = await response.arrayBuffer();
 
-            return buffer;
-        }
+			return buffer;
+		}
 
-        await writable.write(
-            write_tar_entry({
-                filename: 'assets/style.css',
-                data: await get_asset('archive_assets/style.css', signal),
-            }),
-        );
+		await writable.write(
+			write_tar_entry({
+				filename: 'assets/style.css',
+				data: await get_asset('archive_assets/style.css', signal),
+			}),
+		);
 
-        await writable.write(
-            write_tar_entry({
-                filename: 'assets/search.js',
-                data: await get_asset('archive_assets/search.js', signal),
-            }),
-        );
-    }
+		await writable.write(
+			write_tar_entry({
+				filename: 'assets/search.js',
+				data: await get_asset('archive_assets/search.js', signal),
+			}),
+		);
+	}
 
-    async render_other_pages(signal: AbortSignal, writable: FileSystemWritableFileStream, ctx: ContextMap) {
-        signal.throwIfAborted();
+	async render_other_pages(signal: AbortSignal, writable: FileSystemWritableFileStream, ctx: ContextMap) {
+		signal.throwIfAborted();
 
-        const path = `index.html`
-        await writable.write(
-            write_tar_entry({
-                filename: path,
-                data: render_page(WelcomePage(ctx, `/${path}`)),
-            }),
-        );
-    }
+		const path = `index.html`;
+		await writable.write(
+			write_tar_entry({
+				filename: path,
+				data: render_page(WelcomePage(ctx, `/${path}`)),
+			}),
+		);
+	}
 
-    async render_individual_threads(
-        signal: AbortSignal,
-        writable: FileSystemWritableFileStream,
-        ctx: ContextMap,
-        graph: PostGraphMap,
-        posts: AllPostsMap,
-    ) {
-        signal.throwIfAborted();
+	async render_individual_threads(
+		signal: AbortSignal,
+		writable: FileSystemWritableFileStream,
+		ctx: ContextMap,
+		graph: PostGraphMap,
+		posts: AllPostsMap,
+	) {
+		signal.throwIfAborted();
 
-        for (const [did, archive] of ctx) {
-            const sanitized_did = sanitize_did(did);
+		for (const [did, archive] of ctx) {
+			const sanitized_did = sanitize_did(did);
 
-            for (const [rkey, post] of archive.records.posts) {
-                const segment = get_tid_segment(rkey);
-                const uri = make_bsky_post_aturi(did, rkey)
+			for (const [rkey, post] of archive.records.posts) {
+				const segment = get_tid_segment(rkey);
+				const uri = make_bsky_post_aturi(did, rkey);
 
-                const path = `posts/${sanitized_did}/${segment}.html`
-                await writable.write(
-                    write_tar_entry({
-                        filename: path,
-                        data: render_page(ThreadPage(uri, post, ctx, graph, posts, `/${path}`)),
-                    }),
-                );
-            }
-        }
-    }
+				const path = `posts/${sanitized_did}/${segment}.html`;
+				await writable.write(
+					write_tar_entry({
+						filename: path,
+						data: render_page(ThreadPage(uri, post, ctx, graph, posts, `/${path}`)),
+					}),
+				);
+			}
+		}
+	}
 
-    async render_search_page(signal: AbortSignal, writable: FileSystemWritableFileStream, ctx: ContextMap) {
-        signal.throwIfAborted();
+	async render_search_page(signal: AbortSignal, writable: FileSystemWritableFileStream, ctx: ContextMap) {
+		signal.throwIfAborted();
 
-        const path = `search.html`
-        await writable.write(
-            write_tar_entry({
-                filename: path,
-                data: render_page(SearchPage(ctx, `/${path}`))
-            }),
-        );
-    }
+		const path = `search.html`;
+		await writable.write(
+			write_tar_entry({
+				filename: path,
+				data: render_page(SearchPage(ctx, `/${path}`)),
+			}),
+		);
+	}
 
-	async generate_archive(signal: AbortSignal, fd: FileSystemFileHandle, archives: Blob[], with_media: boolean) {
+	async generate_archive(
+		signal: AbortSignal,
+		fd: FileSystemFileHandle,
+		archives: Blob[],
+		with_media: boolean,
+	) {
+		const $status = this.status.get()!;
 
-        const $status = this.status.get()!;
+		// 1. Retrieve posts from the archive
+		$status.textContent = `Reading archives...`;
+		const ctx = await this.create_context_map(signal, archives);
 
-        // 1. Retrieve posts from the archive
-        $status.textContent = `Reading archives...`;
-        const ctx = await this.create_context_map(signal, archives)
+		// 2. Generate pages
+		const writable = await fd.createWritable({ keepExistingData: false });
 
-        // 2. Generate pages
-        const writable = await fd.createWritable({ keepExistingData: false });
+		try {
+			// set up context for rendering pages
+			const { graph, posts } = create_posts_graph(ctx);
 
-        try {
-            // set up context for rendering pages
-            const { graph, posts } = create_posts_graph(ctx)
-            
-            // render individual threads (separate)
-            $status.textContent = `Rendering threads`;
-            await this.render_individual_threads(signal, writable, ctx, graph, posts)
+			// render individual threads (separate)
+			$status.textContent = `Rendering threads`;
+			await this.render_individual_threads(signal, writable, ctx, graph, posts);
 
-            // TODO: render individual profile timelines (separate) // with search?
+			// TODO: render individual profile timelines (separate) // with search?
 
-            // render timelines (combined)
-            $status.textContent = `Rendering timelines`;
-            await this.render_timeline_pages(signal, writable, ctx, graph, posts)
+			// render timelines (combined)
+			$status.textContent = `Rendering timelines`;
+			await this.render_timeline_pages(signal, writable, ctx, graph, posts);
 
-            // render search page (combined)
-            $status.textContent = `Writing search page`;
-            await this.render_search_page(signal, writable, ctx)
+			// render search page (combined)
+			$status.textContent = `Writing search page`;
+			await this.render_search_page(signal, writable, ctx);
 
-            // render other pages (index summary)
-            $status.textContent = `Writing remaining pages`;
-            await this.render_other_pages(signal, writable, ctx)
+			// render other pages (index summary)
+			$status.textContent = `Writing remaining pages`;
+			await this.render_other_pages(signal, writable, ctx);
 
-            // copy necessary assets
-            $status.textContent = `Downloading necessary assets`;
-            await this.copy_necessary_assets(signal, writable)
+			// copy necessary assets
+			$status.textContent = `Downloading necessary assets`;
+			await this.copy_necessary_assets(signal, writable);
 
-            // copy all blobs if requested
-            if (with_media) {
-                await this.copy_all_blobs(signal, writable, ctx)
-            }
+			// copy all blobs if requested
+			if (with_media) {
+				await this.copy_all_blobs(signal, writable, ctx);
+			}
 
-            $status.textContent = `Waiting for writes to finish`;
-            await writable.close();
-        } catch (err) {
-            $status.textContent = `Aborting`;
-            await writable.abort(err);
-            throw err;
-        }
+			$status.textContent = `Waiting for writes to finish`;
+			await writable.close();
+		} catch (err) {
+			$status.textContent = `Aborting`;
+			await writable.abort(err);
+			throw err;
+		}
 
-        $status.textContent = `Archive generation finished`;
+		$status.textContent = `Archive generation finished`;
 	}
 }
 

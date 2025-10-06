@@ -1,23 +1,23 @@
 .AltTextOverlay {
-    @apply fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50
+	@apply fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm;
 }
 
 .AltTextOverlay__header {
-    @apply text-lg font-semibold mb-2
+	@apply mb-2 text-lg font-semibold;
 }
 
 .AltTextOverlay__content {
-    @apply text-sm leading-relaxed break-all whitespace-pre-wrap;
+	@apply whitespace-pre-wrap break-all text-sm leading-relaxed;
 }
 
 .AltTextOverlay__button {
-    @apply mt-4 bg-neutral-800 hover:bg-neutral-700 text-white/100 py-1 px-3 rounded text-sm;
+	@apply mt-4 rounded bg-neutral-800 px-3 py-1 text-sm text-white/100 hover:bg-neutral-700;
 }
 
 .AltTextOverlay--hidden {
-    @apply hidden
+	@apply hidden;
 }
 
 .AltTextOverlay__contentContainer {
-    @apply bg-neutral-900/95 p-6 rounded max-w-3xl w-full shadow-lg flex flex-col items-start max-h-[80vh] overflow-y-auto text-white/100;
+	@apply flex max-h-[80vh] w-full max-w-3xl flex-col items-start overflow-y-auto rounded bg-neutral-900/95 p-6 text-white/100 shadow-lg;
 }

@@ -3,26 +3,27 @@
 this is a fork of [mary](https://bsky.app/profile/did:plc:ia76kvnndjutgedggx2ibrem)'s [skeetgen](https://mary-ext.codeberg.page/skeetgen/) ([source code](https://codeberg.org/mary-ext/skeetgen)).<br>
 
 changes:
-* supports multiple repos
-* adds execute permissions to blob directory so images can be loaded properly
-* adds handling for post records without text (will not cause the import to fail)
-* fixes timeline page title off by one error
-* adds video support
-* adds alt text search
-* adds alt text button (uses js, probably warrants more consideration as a deviation)
-* sorts posts by createdAt rather than rkey
+
+- supports multiple repos
+- adds execute permissions to blob directory so images can be loaded properly
+- adds handling for post records without text (will not cause the import to fail)
+- fixes timeline page title off by one error
+- adds video support
+- adds alt text search
+- adds alt text button (uses js, probably warrants more consideration as a deviation)
+- sorts posts by createdAt rather than rkey
 
 i cannot overstate how much of a nightmare my code is (what was I thinking when i parameterized context?).<br>
 maybe i'll clean it up next weekend (clueless).
 
 ## TODO
 
-* run prettier (yeesh)
-* individual profile pages
-* more powerful search (from:, until:, since:, etc)
-* alt text link chips [drearycore](https://github.com/DrearyWillow/drearycore)
-* revert context params to get_page_context
-* revert generate-archive-form to one big function again
+- run prettier (yeesh)
+- individual profile pages
+- more powerful search (from:, until:, since:, etc)
+- alt text link chips [drearycore](https://github.com/DrearyWillow/drearycore)
+- revert context params to get_page_context
+- revert generate-archive-form to one big function again
 
 ## Usage
 

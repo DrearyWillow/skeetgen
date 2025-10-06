@@ -7,11 +7,11 @@ export interface PageProps {
 	title?: string;
 	children?: JSXNode;
 	head?: JSXNode;
-    ctx: ContextMap;
-    path: string;
+	ctx: ContextMap;
+	path: string;
 }
 
-function Page({ title, children, head, ctx, path}: PageProps) {
+function Page({ title, children, head, ctx, path }: PageProps) {
 	return (
 		<html>
 			<head>
@@ -23,7 +23,7 @@ function Page({ title, children, head, ctx, path}: PageProps) {
 			</head>
 			<body>
 				<div class="Root">
-                    {alt_text_overlay()}
+					{alt_text_overlay()}
 					<div class="Page">
 						<div class="PageHeader">
 							<a href={get_relative_url('/index.html', path)} class="Link">
@@ -40,7 +40,7 @@ function Page({ title, children, head, ctx, path}: PageProps) {
 					</div>
 				</div>
 			</body>
-            <script src={get_asset_url('alt-text-overlay.js', ctx, path)} defer></script>
+			<script src={get_asset_url('alt-text-overlay.js', ctx, path)} defer></script>
 		</html>
 	);
 }
@@ -48,18 +48,15 @@ function Page({ title, children, head, ctx, path}: PageProps) {
 export default Page;
 
 function alt_text_overlay() {
-    return (
-        <div id="alt-text-overlay" class="AltTextOverlay AltTextOverlay--hidden">
-            <div class="AltTextOverlay__contentContainer">
-                <h2 class="AltTextOverlay__header">Alt Text</h2>
-                <p id="alt-text-content" class="AltTextOverlay__content"></p>
-                <button
-                class="AltTextOverlay__button"
-                onclick="hideAltText()"
-                >
-                Close
-                </button>
-            </div>
-        </div>
-    )
+	return (
+		<div id="alt-text-overlay" class="AltTextOverlay AltTextOverlay--hidden">
+			<div class="AltTextOverlay__contentContainer">
+				<h2 class="AltTextOverlay__header">Alt Text</h2>
+				<p id="alt-text-content" class="AltTextOverlay__content"></p>
+				<button class="AltTextOverlay__button" onclick="hideAltText()">
+					Close
+				</button>
+			</div>
+		</div>
+	);
 }

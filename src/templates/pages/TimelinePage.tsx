@@ -17,9 +17,9 @@ export interface TimelinePageProps {
 	current_page: number;
 	total_pages: number;
 	posts: PostTuple[];
-    ctx: ContextMap;
-    path: string;
-    graph: PostGraphMap;
+	ctx: ContextMap;
+	path: string;
+	graph: PostGraphMap;
 }
 
 const TYPE_LABELS: Record<string, string> = {
@@ -28,8 +28,15 @@ const TYPE_LABELS: Record<string, string> = {
 	media: 'Media',
 };
 
-export function TimelinePage({ type, current_page, total_pages, posts, ctx, path, graph }: TimelinePageProps) {
-
+export function TimelinePage({
+	type,
+	current_page,
+	total_pages,
+	posts,
+	ctx,
+	path,
+	graph,
+}: TimelinePageProps) {
 	const label = TYPE_LABELS[type] ?? type;
 	const slices = create_timeline_slices(posts);
 
@@ -57,9 +64,9 @@ export function TimelinePage({ type, current_page, total_pages, posts, ctx, path
 										has_prev={idx !== 0}
 										has_next={idx !== arr.length - 1}
 										always_show_replies={true}
-                                        ctx={ctx}
-                                        path={path}
-                                        graph={graph}
+										ctx={ctx}
+										path={path}
+										graph={graph}
 									/>
 								);
 							})}
@@ -91,7 +98,9 @@ export function TimelinePage({ type, current_page, total_pages, posts, ctx, path
 						return (
 							<a
 								title={!disabled ? `Go to previous page` : undefined}
-								href={!disabled ? get_relative_url(`/timeline/${type}/${current_page - 1}.html`, path) : undefined}
+								href={
+									!disabled ? get_relative_url(`/timeline/${type}/${current_page - 1}.html`, path) : undefined
+								}
 								class={
 									'TimelinePage__page' +
 									(!disabled ? ' Interactive Interactive--primary' : ' TimelinePage__page--disabled')
@@ -110,7 +119,9 @@ export function TimelinePage({ type, current_page, total_pages, posts, ctx, path
 						return (
 							<a
 								title={!disabled ? `Go to next page` : undefined}
-								href={!disabled ? get_relative_url(`/timeline/${type}/${current_page + 1}.html`, path) : undefined}
+								href={
+									!disabled ? get_relative_url(`/timeline/${type}/${current_page + 1}.html`, path) : undefined
+								}
 								class={
 									'TimelinePage__page' +
 									(!disabled ? ' Interactive Interactive--primary' : ' TimelinePage__page--disabled')
@@ -146,7 +157,7 @@ export function TimelinePage({ type, current_page, total_pages, posts, ctx, path
 interface FilterButtonProps {
 	type: FilterType;
 	active: boolean;
-    path: string;
+	path: string;
 }
 
 function FilterButton({ active, type, path }: FilterButtonProps) {

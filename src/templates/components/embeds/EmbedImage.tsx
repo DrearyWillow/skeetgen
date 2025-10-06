@@ -8,8 +8,8 @@ export interface EmbedImageProps {
 	images: EmbeddedImage[];
 	is_bordered: boolean;
 	allow_standalone_ratio: boolean;
-    archive: ContextData;
-    path: string;
+	archive: ContextData;
+	path: string;
 }
 
 const enum RenderMode {
@@ -88,18 +88,16 @@ function render_img(img: EmbeddedImage, mode: RenderMode, archive: ContextData, 
 		ratio = `${aspectRatio!.width}/${aspectRatio!.height}`;
 	}
 
-    const cid = get_blob_str(img.image);
+	const cid = get_blob_str(img.image);
 
 	return (
 		<div class={'EmbedImage__imageContainer ' + cn} style={{ 'aspect-ratio': ratio }}>
 			<img loading="lazy" src={get_blob_url(cid, archive, path)} alt={alt} class="EmbedImage__image" />
-            {alt ? (
-                <button
-                class="EmbedImage__altButton"
-                type="button"
-                onclick={`showAltText(${JSON.stringify(alt)})`}
-                >ALT</button>
-            ) : null}
+			{alt ? (
+				<button class="EmbedImage__altButton" type="button" onclick={`showAltText(${JSON.stringify(alt)})`}>
+					ALT
+				</button>
+			) : null}
 		</div>
 	);
 }

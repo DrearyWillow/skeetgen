@@ -4,21 +4,20 @@ import Page from '../components/Page.tsx';
 import type { ContextMap } from '../context.ts';
 
 export function WelcomePage(ctx: ContextMap, path: string) {
-
 	let root_amount = 0;
 	let replies_amount = 0;
-    let post_amount = 0;
+	let post_amount = 0;
 	{
-        for (const [_, archive] of ctx) {
-            post_amount += archive.records.posts.size
-            for (const post of archive.records.posts.values()) {
-                if (post.reply === undefined) {
-                    root_amount++;
-                } else {
-                    replies_amount++;
-                }
-            }
-        }
+		for (const [_, archive] of ctx) {
+			post_amount += archive.records.posts.size;
+			for (const post of archive.records.posts.values()) {
+				if (post.reply === undefined) {
+					root_amount++;
+				} else {
+					replies_amount++;
+				}
+			}
+		}
 	}
 
 	return (
@@ -29,16 +28,13 @@ export function WelcomePage(ctx: ContextMap, path: string) {
 					There are {format_long(post_amount)} posts in this archive, containing {format_long(root_amount)}{' '}
 					roots and {format_long(replies_amount)} replies. Use the links at the top to navigate.
 				</p>
-                <p class="WelcomePage__paragraph">
-					Accounts in this archive:
-				</p>
-                <ul class="WelcomePage__list">
-                    {Array.from(ctx.values()).map((archive) => (
-                        <li>
-                            <strong>{archive.profile.handle}</strong>{" "}
-                            <code>{archive.profile.did}</code>
-                        </li>
-                    ))}
+				<p class="WelcomePage__paragraph">Accounts in this archive:</p>
+				<ul class="WelcomePage__list">
+					{Array.from(ctx.values()).map((archive) => (
+						<li>
+							<strong>{archive.profile.handle}</strong> <code>{archive.profile.did}</code>
+						</li>
+					))}
 				</ul>
 			</div>
 			<div class="WelcomePage__footer">

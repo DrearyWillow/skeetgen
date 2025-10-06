@@ -6,7 +6,7 @@ import type { ContextMap } from '../../context.ts';
 
 export interface EmbedNotFoundProps {
 	uri: string;
-    ctx: ContextMap;
+	ctx: ContextMap;
 }
 
 const COLLECTION_LABELS: Record<string, string> = {

@@ -14,11 +14,11 @@ export interface ReplyTreeProps {
 	post: AppBskyFeedPost.Record;
 	depth: number;
 	has_next: boolean;
-    ctx: ContextMap;
-    archive: ContextData;
-    path: string;
-    graph: PostGraphMap;
-    posts: AllPostsMap;
+	ctx: ContextMap;
+	archive: ContextData;
+	path: string;
+	graph: PostGraphMap;
+	posts: AllPostsMap;
 }
 
 const MOBILE_DEPTH_LIMIT = 3;
@@ -50,11 +50,11 @@ function ReplyTree({ uri, post, depth, has_next, ctx, archive, path, graph, post
 				post={child_post}
 				depth={depth + 1}
 				has_next={index !== children.length - 1}
-                ctx={ctx}
-                archive={archive}
-                path={path}
-                graph={graph}
-                posts={posts}
+				ctx={ctx}
+				archive={archive}
+				path={path}
+				graph={graph}
+				posts={posts}
 			/>
 		));
 	};
@@ -75,7 +75,15 @@ function ReplyTree({ uri, post, depth, has_next, ctx, archive, path, graph, post
 		<div class="ReplyTree">
 			{has_next ? <div class="ReplyTree__hasSiblingLine"></div> : null}
 
-			<ReplyPost uri={uri} post={post} has_children={children.length > 0} has_parent={depth > 0} ctx={ctx} archive={archive} path={path}/>
+			<ReplyPost
+				uri={uri}
+				post={post}
+				has_children={children.length > 0}
+				has_parent={depth > 0}
+				ctx={ctx}
+				archive={archive}
+				path={path}
+			/>
 
 			{children.length > 0 && (
 				<div class="ReplyTree__children">

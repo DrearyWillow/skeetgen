@@ -6,15 +6,19 @@ import type { ContextData } from '../../context.ts';
 
 export interface EmbedLinkProps {
 	link: EmbeddedLink;
-    archive: ContextData;
-    path: string;
+	archive: ContextData;
+	path: string;
 }
 
 function EmbedLink({ link, archive, path }: EmbedLinkProps) {
 	return (
 		<a href={link.uri} target="_blank" rel="noopener noreferrer nofollow" class="EmbedLink Interactive">
 			{link.thumb && (
-				<img loading="lazy" src={get_blob_url(get_blob_str(link.thumb), archive, path)} class="EmbedLink__thumb" />
+				<img
+					loading="lazy"
+					src={get_blob_url(get_blob_str(link.thumb), archive, path)}
+					class="EmbedLink__thumb"
+				/>
 			)}
 
 			<div class="EmbedLink__main">

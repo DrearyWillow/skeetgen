@@ -6,8 +6,8 @@ import type { ContextData } from '../../context.ts';
 
 export interface EmbedFeedProps {
 	record: AppBskyFeedGenerator.Record;
-    archive: ContextData;
-    path: string;
+	archive: ContextData;
+	path: string;
 }
 
 function EmbedFeed({ record, archive, path }: EmbedFeedProps) {
@@ -15,7 +15,11 @@ function EmbedFeed({ record, archive, path }: EmbedFeedProps) {
 		<div class="EmbedFeed">
 			<div class="EmbedFeed__avatarContainer">
 				{record.avatar ? (
-					<img loading="lazy" src={get_blob_url(get_blob_str(record.avatar), archive, path)} class="EmbedFeed__avatar" />
+					<img
+						loading="lazy"
+						src={get_blob_url(get_blob_str(record.avatar), archive, path)}
+						class="EmbedFeed__avatar"
+					/>
 				) : null}
 			</div>
 

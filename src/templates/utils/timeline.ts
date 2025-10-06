@@ -39,7 +39,7 @@ export function create_timeline_slices(arr: PostTuple[]) {
 
 		const item: TimelineItem = {
 			uri: uri,
-            // postref: uri_to_postref(uri),
+			// postref: uri_to_postref(uri),
 			post: post,
 		};
 
