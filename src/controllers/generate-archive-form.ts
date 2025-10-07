@@ -417,6 +417,13 @@ class GenerateArchiveForm extends HTMLElement {
 				data: await get_asset('archive_assets/search.js', signal),
 			}),
 		);
+
+		await writable.write(
+			write_tar_entry({
+				filename: 'assets/alt-text-overlay.js',
+				data: await get_asset('archive_assets/alt-text-overlay.js', signal),
+			}),
+		);
 	}
 
 	async render_other_pages(signal: AbortSignal, writable: FileSystemWritableFileStream, ctx: ContextMap) {

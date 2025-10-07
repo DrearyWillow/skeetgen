@@ -18,12 +18,13 @@ maybe i'll clean it up next weekend (clueless).
 
 ## TODO
 
-- run prettier (yeesh)
 - individual profile pages
 - more powerful search (from:, until:, since:, etc)
-- alt text link chips [drearycore](https://github.com/DrearyWillow/drearycore)
-- revert context params to get_page_context
-- revert generate-archive-form to one big function again
+- alt text link chips (like [drearycore](https://github.com/DrearyWillow/drearycore))
+- add clickable links inside of alt text modal
+- revert context params to get_page_context, or subsume into one context param
+- less terrible variable names
+- add image modal on click
 
 ## Usage
 
