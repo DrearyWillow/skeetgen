@@ -2,7 +2,7 @@ import type { AppBskyFeedPost, At } from '@mary/bluesky-client/lexicons';
 
 // import { get_page_context } from '../context.ts';
 import { format_abs_date, format_abs_date_time } from '../intl/time.ts';
-import { get_blob_url, get_post_url } from '../utils/url.ts';
+import { get_blob_url, get_post_url, get_relative_url, sanitize_did } from '../utils/url.ts';
 
 import Embed from './Embed.tsx';
 import RichTextRenderer from './RichTextRenderer.tsx';
@@ -20,20 +20,25 @@ export interface ReplyPostProps {
 }
 
 function ReplyPost({ uri, post, has_children, has_parent, ctx, archive, path }: ReplyPostProps) {
-	// const ctx = get_page_context();
+	const profile_page_url = get_relative_url(
+		`/profile/${sanitize_did(archive.profile.did)}/posts/1.html`,
+		path,
+	);
 
 	return (
 		<div class="ReplyPost">
 			<div class="ReplyPost__aside">
-				<div class="ReplyPost__avatarContainer">
-					{archive.profile.avatar ? (
-						<img
-							loading="lazy"
-							src={get_blob_url(archive.profile.avatar, archive, path)}
-							class="ReplyPost__avatar"
-						/>
-					) : null}
-				</div>
+				<a href={profile_page_url}>
+					<div class="ReplyPost__avatarContainer">
+						{archive.profile.avatar ? (
+							<img
+								loading="lazy"
+								src={get_blob_url(archive.profile.avatar, archive, path)}
+								class="ReplyPost__avatar"
+							/>
+						) : null}
+					</div>
+				</a>
 
 				{has_children ? <div class="ReplyPost__hasChildrenLine"></div> : null}
 				{has_parent ? <div class="ReplyPost__hasParentLine"></div> : null}
@@ -43,11 +48,15 @@ function ReplyPost({ uri, post, has_children, has_parent, ctx, archive, path }: 
 				<div class="ReplyPost__header">
 					<span class="ReplyPost__nameContainer">
 						{archive.profile.displayName ? (
-							<bdi class="ReplyPost__displayNameContainer">
-								<span class="ReplyPost__displayName">{archive.profile.displayName}</span>
-							</bdi>
+							<a href={profile_page_url}>
+								<bdi class="ReplyPost__displayNameContainer">
+									<span class="ReplyPost__displayName">{archive.profile.displayName}</span>
+								</bdi>
+							</a>
 						) : (
-							<span class="ReplyPost__handle">@{archive.profile.handle}</span>
+							<a href={profile_page_url}>
+								<span class="ReplyPost__handle">@{archive.profile.handle}</span>
+							</a>
 						)}
 					</span>
 

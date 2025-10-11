@@ -2,7 +2,21 @@ import * as FlexSearch from '@akryum/flexsearch-es';
 
 import { app, h, memo, text } from './dependencies/hyperapp.js';
 
-/** @typedef {[rkey: string, text: string, timestamp: number, flags: number, alt: string, profile: {displayName: string, handle: string}] & { idx: number }} PostEntry */
+/**
+ * @typedef {(
+ *   [rkey: string,
+ *    text: string,
+ *    timestamp: number,
+ *    flags: number,
+ *    alt: string,
+ *    profile: {
+ *      displayName: string,
+ *      handle: string,
+ *      did: string
+ *    }
+ *   ] & { idx: number }
+ * )} PostEntry
+ */
 
 /** @type {FlexSearch.Document<PostEntry, true>} */
 const index = new FlexSearch.Document({
@@ -11,6 +25,7 @@ const index = new FlexSearch.Document({
 		index: ['1', '4'], // post text and alt text
 		store: true,
 	},
+	// tokenize: 'forward', // 'full'
 });
 
 // Add posts to document
@@ -129,9 +144,13 @@ const index = new FlexSearch.Document({
 
 	function render_search_item({ item }) {
 		const [postref, post_text, ts, flags, alt, profile] = item;
+		const profile_page_url = `profile/${profile.did.replaceAll(':', '_')}/posts/1.html`;
 
 		return h('div', { class: 'SearchItem__content' }, [
-			h('p', { class: 'SearchItem__displayName' }, text(`@${profile.handle}`)),
+			h('a', { href: profile_page_url, class: 'SearchItem__displayName' }, [
+				text(`@${profile.handle || profile.did}`),
+			]),
+			h('br', {}, []),
 			h('a', { href: `posts/${postref}.html`, class: 'SearchItem__timestamp' }, [
 				text(ts === 0 ? 'N/A' : abs_with_time.format(ts)),
 			]),

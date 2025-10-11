@@ -4,7 +4,7 @@ import type { AppBskyFeedPost } from '@mary/bluesky-client/lexicons';
 
 // import { get_page_context } from '../context.ts';
 import { format_abs_date_time } from '../intl/time.ts';
-import { get_blob_url } from '../utils/url.ts';
+import { get_blob_url, get_relative_url, sanitize_did } from '../utils/url.ts';
 
 import Embed from './Embed.tsx';
 import RichTextRenderer from './RichTextRenderer.tsx';
@@ -19,26 +19,35 @@ interface PermalinkPostProps {
 }
 
 function PermalinkPost({ post, ctx, archive, path }: PermalinkPostProps) {
-	// const ctx = get_page_context();
+	const profile_page_url = get_relative_url(
+		`/profile/${sanitize_did(archive.profile.did)}/posts/1.html`,
+		path,
+	);
 
 	return (
 		<div class="PermalinkPost">
 			<div class="PermalinkPost__header">
-				<div class="PermalinkPost__avatarContainer">
-					{archive.profile.avatar ? (
-						<img
-							loading="lazy"
-							src={get_blob_url(archive.profile.avatar, archive, path)}
-							class="PermalinkPost__avatar"
-						/>
-					) : null}
-				</div>
+				<a href={profile_page_url}>
+					<div class="PermalinkPost__avatarContainer">
+						{archive.profile.avatar ? (
+							<img
+								loading="lazy"
+								src={get_blob_url(archive.profile.avatar, archive, path)}
+								class="PermalinkPost__avatar"
+							/>
+						) : null}
+					</div>
+				</a>
 
 				<span class="PermalinkPost__nameContainer">
-					<bdi class="PermalinkPost__displayNameContainer">
-						<span class="PermalinkPost__displayName">{archive.profile.displayName}</span>
-					</bdi>
-					<span class="PermalinkPost__handle">@{archive.profile.handle}</span>
+					<a href={profile_page_url}>
+						<bdi class="PermalinkPost__displayNameContainer">
+							<span class="PermalinkPost__displayName">{archive.profile.displayName}</span>
+						</bdi>
+					</a>
+					<a href={profile_page_url}>
+						<span class="PermalinkPost__handle">@{archive.profile.handle}</span>
+					</a>
 				</span>
 			</div>
 

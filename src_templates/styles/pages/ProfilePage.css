@@ -1,0 +1,80 @@
+.ProfilePage__feed {
+	@apply flex flex-col gap-[16px] py-[16px];
+}
+.ProfilePage__feedSeparator {
+	@apply mx-[16px];
+}
+
+.ProfilePage__pagination {
+	@apply flex flex-wrap items-center justify-center gap-[8px] p-[16px];
+}
+.ProfilePage__page {
+	@apply rounded px-[10px] py-[4px] font-medium proportional-nums;
+}
+.ProfilePage__page--active {
+	@apply bg-neutral-700;
+}
+.ProfilePage__page--disabled {
+	@apply text-neutral-500/100;
+}
+.ProfilePage__pageIcon {
+	@apply mx-[-6px] h-[20px] w-[20px];
+}
+.ProfilePage__pageIcon--boundary {
+}
+.ProfilePage__pageIcon--prev {
+	rotate: 180deg;
+}
+.ProfilePage__pageIcon--next {
+}
+
+.ProfilePage__profileHeader {
+	@apply relative flex w-full flex-col;
+}
+
+.ProfilePage__bannerContainer {
+	@apply relative w-full bg-neutral-800;
+	aspect-ratio: 3 / 1;
+	min-height: 100px;
+}
+
+.ProfilePage__pfpContainer {
+	@apply absolute left-[16px];
+	bottom: 0;
+	transform: translateY(50%);
+	width: 80px;
+	height: 80px;
+	border-radius: 9999px;
+	background-color: #222;
+	border: 3px solid rgb(23 23 23);
+	overflow: hidden;
+	z-index: 10;
+}
+
+.ProfilePage__banner {
+	@apply h-full w-full overflow-hidden object-cover;
+}
+
+.ProfilePage__pfp {
+	@apply h-full w-full rounded-full object-cover;
+}
+
+.ProfilePage__nameContainer {
+	@apply flex flex-col gap-[4px] pl-[16px] pt-[48px];
+}
+
+.ProfilePage__displayName {
+	@apply text-xl font-semibold text-white;
+}
+
+.ProfilePage__handle {
+	@apply text-neutral-400;
+}
+
+.ProfilePage__did {
+	@apply text-sm text-neutral-500;
+}
+
+.ProfilePage__description {
+	@apply mt-[8px] max-w-prose text-base text-neutral-200;
+}

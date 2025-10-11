@@ -25,6 +25,10 @@
 .SearchItem__content {
 }
 .SearchItem__displayName {
+	@apply font-semibold;
+}
+.SearchItem__displayName:hover {
+	@apply underline;
 }
 .SearchItem__timestamp {
 	@apply mb-[2px] text-neutral-400/100 hover:underline;

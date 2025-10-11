@@ -51,8 +51,14 @@
 .FeedPost__displayName {
 	@apply font-bold text-white/100;
 }
+.FeedPost__displayName:hover {
+	@apply underline;
+}
 .FeedPost__handle {
 	@apply block overflow-hidden text-ellipsis whitespace-nowrap;
+}
+.FeedPost__handle:hover {
+	@apply underline;
 }
 
 .FeedPost__dot {

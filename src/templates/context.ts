@@ -2,15 +2,11 @@ import type { TrustedHTML } from '@intrnl/jsx-to-string';
 
 import type {
 	AppBskyActorDefs,
+	AppBskyActorProfile,
 	AppBskyFeedGenerator,
 	AppBskyFeedPost,
 	AppBskyFeedThreadgate,
 	AppBskyGraphList,
-	// AppBskyActorDefs,
-	// AppBskyFeedGenerator,
-	// AppBskyFeedPost,
-	// AppBskyFeedThreadgate,
-	// AppBskyGraphList,
 	At,
 } from '@mary/bluesky-client/lexicons';
 
@@ -26,6 +22,7 @@ export interface ContextData {
 		lists: Map<string, AppBskyGraphList.Record>;
 		posts: Map<string, AppBskyFeedPost.Record>;
 		threadgates: Map<string, AppBskyFeedThreadgate.Record>;
+		profile?: AppBskyActorProfile.Record;
 	};
 
 	profile: AppBskyActorDefs.ProfileViewBasic;

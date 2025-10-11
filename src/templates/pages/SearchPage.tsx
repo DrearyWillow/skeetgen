@@ -5,6 +5,7 @@ import { get_asset_url, get_tid_segment, sanitize_did } from '../utils/url.ts';
 import Page from '../components/Page.tsx';
 import type { ContextMap } from '../context.ts';
 import type { ExtendedEmbed } from '../utils/embed.ts';
+import type { At } from '@mary/bluesky-client/lexicons';
 
 const enum PostFlags {
 	HAS_EMBED_IMAGE = 1 << 0,
@@ -18,6 +19,7 @@ const enum PostFlags {
 type MinimumProfile = {
 	displayName: string;
 	handle: string;
+	did: At.DID;
 };
 
 type PostEntry = [rkey: string, text: string, ts: number, flag: number, alt: string, profile: MinimumProfile];
@@ -32,6 +34,7 @@ export function SearchPage(ctx: ContextMap, path: string) {
 			const profile = {
 				displayName: archive.profile.displayName || '',
 				handle: archive.profile.handle,
+				did: archive.profile.did,
 			};
 
 			for (const [rkey, post] of archive.records.posts) {
@@ -132,7 +135,7 @@ function push_alt_part(alt_parts: string[], embed: ExtendedEmbed) {
 		// https://github.com/bluesky-social/social-app/blob/main/src/lib/gif-alt-text.ts#L1
 		const text = embed.external.description;
 		if (typeof text === 'string' && text.startsWith('Alt: ')) {
-			alt_parts.push(text.trim());
+			alt_parts.push(text.replace('Alt: ', '').trim());
 		}
 	}
 }

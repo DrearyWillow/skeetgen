@@ -2,7 +2,7 @@ import type { AppBskyFeedPost, At } from '@mary/bluesky-client/lexicons';
 
 // import { get_page_context } from '../context.ts';
 import { format_abs_date, format_abs_date_time } from '../intl/time.ts';
-import { get_blob_url, get_post_url, get_repo_id } from '../utils/url.ts';
+import { get_blob_url, get_post_url, get_relative_url, get_repo_id, sanitize_did } from '../utils/url.ts';
 
 import Embed from './Embed.tsx';
 import RichTextRenderer from './RichTextRenderer.tsx';
@@ -30,6 +30,10 @@ function FeedPost({ uri, post, always_show_replies, has_prev, has_next, ctx, pat
 
 	// const uri = postref_to_uri(postref);
 	const archive = ctx.get(get_repo_id(uri) as At.DID) as ContextData;
+	const profile_page_url = get_relative_url(
+		`/profile/${sanitize_did(archive.profile.did)}/posts/1.html`,
+		path,
+	);
 
 	let reply_count = 0;
 	{
@@ -54,15 +58,17 @@ function FeedPost({ uri, post, always_show_replies, has_prev, has_next, ctx, pat
 
 			<div class="FeedPost__content">
 				<div class="FeedPost__aside">
-					<div class="FeedPost__avatarContainer">
-						{archive.profile.avatar ? (
-							<img
-								loading="lazy"
-								src={get_blob_url(archive.profile.avatar, archive, path)}
-								class="FeedPost__avatar"
-							/>
-						) : null}
-					</div>
+					<a href={profile_page_url}>
+						<div class="FeedPost__avatarContainer">
+							{archive.profile.avatar ? (
+								<img
+									loading="lazy"
+									src={get_blob_url(archive.profile.avatar, archive, path)}
+									class="FeedPost__avatar"
+								/>
+							) : null}
+						</div>
+					</a>
 
 					{has_next ? <div class="FeedPost__hasNextLine"></div> : null}
 				</div>
@@ -72,10 +78,14 @@ function FeedPost({ uri, post, always_show_replies, has_prev, has_next, ctx, pat
 						<span class="FeedPost__nameContainer">
 							{archive.profile.displayName ? (
 								<bdi class="FeedPost__displayNameContainer">
-									<span class="FeedPost__displayName">{archive.profile.displayName}</span>
+									<a href={profile_page_url}>
+										<span class="FeedPost__displayName">{archive.profile.displayName}</span>
+									</a>
 								</bdi>
 							) : (
-								<span class="FeedPost__handle">@{archive.profile.handle}</span>
+								<a href={profile_page_url}>
+									<span class="FeedPost__handle">@{archive.profile.handle}</span>
+								</a>
 							)}
 						</span>
 

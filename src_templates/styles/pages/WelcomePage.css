@@ -27,3 +27,11 @@
 .WelcomePage__footer {
 	@apply px-[16px] py-2 text-center text-[13px] text-neutral-400/100;
 }
+
+.WelcomePage__list li strong:hover {
+	@apply underline;
+}
+
+.WelcomePage__list li code:hover {
+	@apply underline;
+}

@@ -25,9 +25,14 @@ import { get_tid_segment, make_bsky_post_aturi, sanitize_did } from '../template
 
 import { SearchPage } from '../templates/pages/SearchPage.tsx';
 import { ThreadPage } from '../templates/pages/ThreadPage.tsx';
-import { TimelinePage } from '../templates/pages/TimelinePage.tsx';
+import {
+	TimelinePage,
+	type TimelineType,
+	type TimelineTypeRecord,
+} from '../templates/pages/TimelinePage.tsx';
 import { WelcomePage } from '../templates/pages/WelcomePage.tsx';
 import type { ExtendedEmbed } from '../templates/utils/embed.ts';
+import { ProfilePage } from '../templates/pages/ProfilePage.tsx';
 
 const supports_fsa = 'showDirectoryPicker' in globalThis;
 
@@ -169,6 +174,110 @@ class GenerateArchiveForm extends HTMLElement {
 		}
 	}
 
+	async render_profile_pages(
+		signal: AbortSignal,
+		writable: FileSystemWritableFileStream,
+		ctx: ContextMap,
+		graph: PostGraphMap,
+	) {
+		signal.throwIfAborted();
+
+		for (const [did, archive] of ctx) {
+			const did_posts = new Map();
+			for (const [rkey, post] of archive.records.posts) {
+				did_posts.set(make_bsky_post_aturi(did, rkey), post);
+			}
+
+			// Collect all [uri, post] pairs into an array
+			const post_tuples = [...did_posts];
+
+			// Sort newest-first by createdAt
+			post_tuples.sort((a, b) => {
+				const dateA = new Date(a[1].createdAt).getTime();
+				const dateB = new Date(b[1].createdAt).getTime();
+
+				const safeA = Number.isNaN(dateA) ? 0 : dateA;
+				const safeB = Number.isNaN(dateB) ? 0 : dateB;
+
+				return safeB - safeA;
+			});
+
+			const root_posts = post_tuples.filter(([, post]) => post.reply === undefined);
+
+			const media_posts = post_tuples.filter(([, post]) => {
+				const embed = post.embed as ExtendedEmbed;
+				return (
+					embed !== undefined &&
+					(embed.$type === 'app.bsky.embed.images' ||
+						embed.$type === 'app.bsky.embed.video' ||
+						(embed.$type === 'app.bsky.embed.recordWithMedia' &&
+							(embed.media.$type === 'app.bsky.embed.images' ||
+								embed.media.$type === 'app.bsky.embed.video')))
+				);
+			});
+
+			const video_posts = post_tuples.filter(([, post]) => {
+				const embed = post.embed as ExtendedEmbed;
+				return (
+					embed !== undefined &&
+					(embed.$type === 'app.bsky.embed.video' ||
+						(embed.$type === 'app.bsky.embed.recordWithMedia' &&
+							embed.media.$type === 'app.bsky.embed.video'))
+				);
+			});
+
+			const post_counts: TimelineTypeRecord = {
+				posts: root_posts.length,
+				with_replies: post_tuples.length,
+				media: media_posts.length,
+				videos: video_posts.length,
+			};
+
+			await write_profile_pages('posts', root_posts, archive, post_counts);
+			await write_profile_pages('with_replies', post_tuples, archive, post_counts);
+			await write_profile_pages('media', media_posts, archive, post_counts);
+			await write_profile_pages('videos', video_posts, archive, post_counts);
+		}
+
+		async function write_profile_pages(
+			type: TimelineType,
+			tuples: [uri: string, post: AppBskyFeedPost.Record][],
+			archive: ContextData,
+			post_counts: TimelineTypeRecord,
+		) {
+			const pages = chunked(tuples, 50);
+
+			// Push an empty page
+			if (pages.length === 0) {
+				pages.push([]);
+			}
+
+			for (let i = 0, ilen = pages.length; i < ilen; i++) {
+				const page = pages[i];
+
+				const path = `profile/${sanitize_did(archive.profile.did)}/${type}/${i + 1}.html`;
+				await writable.write(
+					write_tar_entry({
+						filename: path,
+						data: render_page(
+							ProfilePage({
+								type: type,
+								current_page: i + 1,
+								total_pages: ilen,
+								posts: page,
+								path: `/${path}`,
+								ctx: ctx,
+								graph: graph,
+								profile_archive: archive,
+								post_counts: post_counts,
+							}),
+						),
+					}),
+				);
+			}
+		}
+	}
+
 	async render_timeline_pages(
 		signal: AbortSignal,
 		writable: FileSystemWritableFileStream,
@@ -224,10 +333,26 @@ class GenerateArchiveForm extends HTMLElement {
 
 				await write_timeline_pages('media', media_posts);
 			}
+
+			// Video posts only
+			{
+				const video_posts = post_tuples.filter(([, post]) => {
+					const embed = post.embed as ExtendedEmbed;
+
+					return (
+						embed !== undefined &&
+						(embed.$type === 'app.bsky.embed.video' ||
+							(embed.$type === 'app.bsky.embed.recordWithMedia' &&
+								embed.media.$type === 'app.bsky.embed.video'))
+					);
+				});
+
+				await write_timeline_pages('videos', video_posts);
+			}
 		}
 
 		async function write_timeline_pages(
-			type: 'posts' | 'with_replies' | 'media',
+			type: TimelineType,
 			tuples: [uri: string, post: AppBskyFeedPost.Record][],
 		) {
 			const pages = chunked(tuples, 50);
@@ -370,6 +495,7 @@ class GenerateArchiveForm extends HTMLElement {
 					lists: lists,
 					posts: posts,
 					threadgates: threadgates,
+					profile: profile,
 				},
 				archive: archive,
 				profile: {
@@ -500,7 +626,9 @@ class GenerateArchiveForm extends HTMLElement {
 			$status.textContent = `Rendering threads`;
 			await this.render_individual_threads(signal, writable, ctx, graph, posts);
 
-			// TODO: render individual profile timelines (separate) // with search?
+			// render individual profiles (separate)
+			$status.textContent = `Rendering profiles`;
+			await this.render_profile_pages(signal, writable, ctx, graph);
 
 			// render timelines (combined)
 			$status.textContent = `Rendering timelines`;

@@ -22,8 +22,14 @@
 .PermalinkPost__displayName {
 	@apply font-bold text-white/100;
 }
+.PermalinkPost__displayName:hover {
+	@apply underline;
+}
 .PermalinkPost__handle {
 	@apply block overflow-hidden text-ellipsis whitespace-nowrap;
+}
+.PermalinkPost__handle:hover {
+	@apply underline;
 }
 
 .PermalinkPost__body {

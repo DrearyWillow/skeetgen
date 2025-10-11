@@ -38,8 +38,14 @@
 .ReplyPost__displayName {
 	@apply font-bold text-white/100;
 }
+.ReplyPost__displayName:hover {
+	@apply underline;
+}
 .ReplyPost__handle {
 	@apply block overflow-hidden text-ellipsis whitespace-nowrap;
+}
+.ReplyPost__handle:hover {
+	@apply underline;
 }
 .ReplyPost__dot {
 	@apply select-none px-[4px];

@@ -2,6 +2,7 @@ import { format_long } from '../intl/number.ts';
 
 import Page from '../components/Page.tsx';
 import type { ContextMap } from '../context.ts';
+import { get_relative_url, sanitize_did } from '../utils/url.ts';
 
 export function WelcomePage(ctx: ContextMap, path: string) {
 	let root_amount = 0;
@@ -32,7 +33,12 @@ export function WelcomePage(ctx: ContextMap, path: string) {
 				<ul class="WelcomePage__list">
 					{Array.from(ctx.values()).map((archive) => (
 						<li>
-							<strong>{archive.profile.handle}</strong> <code>{archive.profile.did}</code>
+							<a href={get_relative_url(`/profile/${sanitize_did(archive.profile.did)}/posts/1.html`, path)}>
+								<strong>{archive.profile.handle}</strong>
+							</a>{' '}
+							<a href={get_relative_url(`/profile/${sanitize_did(archive.profile.did)}/posts/1.html`, path)}>
+								<code>{archive.profile.did}</code>
+							</a>
 						</li>
 					))}
 				</ul>

@@ -18,13 +18,36 @@ maybe i'll clean it up next weekend (clueless).
 
 ## TODO
 
-- individual profile pages
-- more powerful search (from:, until:, since:, etc)
+- more powerful search (from:, until:, since:, domain:?, replyto:?, blob:cid)
+  - from: should support did as well as handle because of the multi-handle or no-handle problem
+  - consider modifying search to tokenize forward or full
+    - maybe conditionally switch to a separate flexsearch document if the search string contains "\*" or something
 - alt text link chips (like [drearycore](https://github.com/DrearyWillow/drearycore))
 - add clickable links inside of alt text modal
 - revert context params to get_page_context, or subsume into one context param
-- less terrible variable names
-- add image modal on click
+  - redesign `profile` in `ContextData` when you do this
+  - maybe do one big loop to optimize at the start when building ctx
+    - all posts (and maybe one split out by did with the uri instead of rkey)
+    - blob cids for search
+    - replies/ancestors/quotes?
+    - benefits:
+      - lower time complexity
+      - everything prebuilt in a context array
+    - drawbacks:
+      - less clarity where things are actually coming from
+      - less modular
+      - more messy
+      - less flexible: will have to go back and change context code every time you want a new data item
+- less terrible variable names (specifically, archive in ctx, overlay -> modal)
+- add image modal on click (alt text?)
+- add props back to the functions i inexplicably tore them out of
+- look back at mary's ~~image~~ css, mine is ugly
+- did i break something with thread views? some replies without parents despite being same-user?
+- ensure de-dupe works okay if two identical repos are entered
+- quotes page
+- color scheme (pink yay)
+- on timelines, if you click the three dots, you should be able to enter a number and go to that page
+  - if invalid, don't move
 
 ## Usage
 

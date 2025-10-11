@@ -14,8 +14,9 @@
 @import './components/ReplyPost.css';
 @import './components/ReplyTree.css';
 
+@import './pages/AltTextOverlay.css';
+@import './pages/ProfilePage.css';
 @import './pages/SearchPage.css';
 @import './pages/ThreadPage.css';
 @import './pages/TimelinePage.css';
 @import './pages/WelcomePage.css';
-@import './pages/AltTextOverlay.css';

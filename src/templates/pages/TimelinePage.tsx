@@ -10,10 +10,11 @@ import Page from '../components/Page.tsx';
 import type { ContextMap } from '../context.ts';
 import type { PostGraphMap } from '../utils/posts.ts';
 
-type FilterType = 'posts' | 'with_replies' | 'media';
+export type TimelineType = 'posts' | 'with_replies' | 'media' | 'videos';
+export type TimelineTypeRecord = Record<TimelineType, number>;
 
 export interface TimelinePageProps {
-	type: FilterType;
+	type: TimelineType;
 	current_page: number;
 	total_pages: number;
 	posts: PostTuple[];
@@ -26,6 +27,7 @@ const TYPE_LABELS: Record<string, string> = {
 	posts: 'Posts',
 	with_replies: 'Replies',
 	media: 'Media',
+	videos: 'Videos',
 };
 
 export function TimelinePage({
@@ -48,6 +50,7 @@ export function TimelinePage({
 				<FilterButton type="posts" active={type === 'posts'} path={path} />
 				<FilterButton type="with_replies" active={type === 'with_replies'} path={path} />
 				<FilterButton type="media" active={type === 'media'} path={path} />
+				<FilterButton type="videos" active={type === 'videos'} path={path} />
 			</div>
 
 			<div class="TimelinePage__feed">
@@ -155,7 +158,7 @@ export function TimelinePage({
 }
 
 interface FilterButtonProps {
-	type: FilterType;
+	type: TimelineType;
 	active: boolean;
 	path: string;
 }
