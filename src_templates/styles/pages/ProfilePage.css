@@ -31,13 +31,11 @@
 .ProfilePage__profileHeader {
 	@apply relative flex w-full flex-col;
 }
-
 .ProfilePage__bannerContainer {
 	@apply relative w-full bg-neutral-800;
 	aspect-ratio: 3 / 1;
 	min-height: 100px;
 }
-
 .ProfilePage__pfpContainer {
 	@apply absolute left-[16px];
 	bottom: 0;
@@ -50,31 +48,37 @@
 	overflow: hidden;
 	z-index: 10;
 }
-
 .ProfilePage__banner {
 	@apply h-full w-full overflow-hidden object-cover;
 }
-
 .ProfilePage__pfp {
 	@apply h-full w-full rounded-full object-cover;
 }
-
 .ProfilePage__nameContainer {
 	@apply flex flex-col gap-[4px] pl-[16px] pt-[48px];
 }
-
 .ProfilePage__displayName {
 	@apply text-xl font-semibold text-white;
 }
-
 .ProfilePage__handle {
 	@apply text-neutral-400;
 }
-
 .ProfilePage__did {
 	@apply text-sm text-neutral-500;
 }
-
 .ProfilePage__description {
 	@apply mt-[8px] max-w-prose text-base text-neutral-200;
+}
+
+.ProfilePage__pageInput {
+	padding: 0px 0px;
+}
+.ProfilePage__pageInput > .pageInput {
+	width: 2.5em;
+	text-align: center;
+	background: transparent;
+	border: none;
+	border-radius: 0.25em;
+	height: 1.4em;
+	color: inherit;
 }

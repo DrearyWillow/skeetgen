@@ -16,7 +16,8 @@
 			"dependencies": [
 				"gen:archive_css",
 				"gen:archive_search_js",
-				"gen:archive_alt_text_js"
+				"gen:archive_alt_text_js",
+				"gen:archive_page_input_js"
 			]
 		},
 		"gen:archive_css": {
@@ -45,6 +46,15 @@
 			],
 			"output": [
 				"public/archive_assets/alt-text-overlay.js"
+			]
+		},
+		"gen:archive_page_input_js": {
+			"command": "esbuild src_templates/scripts/page-input.js --bundle --format=iife --outfile=public/archive_assets/page-input.js --minify-syntax --minify-whitespace",
+			"files": [
+				"src_templates/scripts/page-input.js"
+			],
+			"output": [
+				"public/archive_assets/page-input.js"
 			]
 		}
 	},

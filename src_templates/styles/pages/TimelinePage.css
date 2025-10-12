@@ -27,3 +27,16 @@
 }
 .TimelinePage__pageIcon--next {
 }
+
+.TimelinePage__pageInput {
+	padding: 0px 0px;
+}
+.TimelinePage__pageInput > .pageInput {
+	width: 2.5em;
+	text-align: center;
+	background: transparent;
+	border: none;
+	border-radius: 0.25em;
+	height: 1.4em;
+	color: inherit;
+}

@@ -1,6 +1,6 @@
 import { repeat } from '@intrnl/jsx-to-string';
 
-import { get_blob_url, get_relative_url, sanitize_did } from '../utils/url.ts';
+import { get_asset_url, get_blob_url, get_relative_url, sanitize_did } from '../utils/url.ts';
 
 import { create_pagination } from '../utils/pagination.ts';
 import { create_timeline_slices, type PostTuple } from '../utils/timeline.ts';
@@ -201,13 +201,16 @@ export function ProfilePage({
 
 					if (val === 'dots_start' || val === 'dots_end') {
 						return (
-							<div class="ProfilePage__page ProfilePage__page--disabled">
-								<svg class="ProfilePage__pageIcon ProfilePage__pageIcon--boundary" viewBox="0 0 24 24">
-									<path
-										fill="currentColor"
-										d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2"
-									/>
-								</svg>
+							<div class="ProfilePage__page ProfilePage__page--disabled ProfilePage__pageInput">
+								<input
+									type="text"
+									inputmode="numeric"
+									min="1"
+									max={total_pages}
+									placeholder="…"
+									class="pageInput"
+									name="pageInput"
+								/>
 							</div>
 						);
 					}
@@ -215,6 +218,8 @@ export function ProfilePage({
 					return null;
 				})}
 			</div>
+
+			<script src={get_asset_url('page-input.js', ctx, path)}></script>
 		</Page>
 	);
 }

@@ -5,12 +5,14 @@ this is a fork of [mary](https://bsky.app/profile/did:plc:ia76kvnndjutgedggx2ibr
 changes:
 
 - supports multiple repos
-- adds execute permissions to blob directory so images can be loaded properly
-- adds handling for post records without text (will not cause the import to fail)
-- fixes timeline page title off by one error
+- adds profile pages
 - adds video support
 - adds alt text search
 - adds alt text button (uses js, probably warrants more consideration as a deviation)
+- adds page input buttons
+- adds execute permissions to blob directory so images can be loaded properly
+- adds handling for post records without text (will not cause the import to fail)
+- fixes timeline page title off by one error
 - sorts posts by createdAt rather than rkey
 
 i cannot overstate how much of a nightmare my code is (what was I thinking when i parameterized context?).<br>
@@ -46,8 +48,7 @@ maybe i'll clean it up next weekend (clueless).
 - ensure de-dupe works okay if two identical repos are entered
 - quotes page
 - color scheme (pink yay)
-- on timelines, if you click the three dots, you should be able to enter a number and go to that page
-  - if invalid, don't move
+- don't render videos in timeline quotes (too small), thumbnail should be fine?
 
 ## Usage
 
