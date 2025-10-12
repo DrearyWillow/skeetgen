@@ -2,10 +2,10 @@
 
 import { repeat, type JSXNode } from '@intrnl/jsx-to-string';
 
-import type { AppBskyFeedPost, AppBskyActorDefs, At } from '@mary/bluesky-client/lexicons';
+import type { AppBskyFeedPost, At } from '@mary/bluesky-client/lexicons';
 import type { ContextMap } from '../context.ts';
 import type { ContextData } from '../context.ts';
-import type { AllPostsMap, PostGraphMap } from '../utils/posts.ts';
+import type { AllPostsMap, PostGraphMap, QuotesMap } from '../utils/posts.ts';
 
 import { get_blob_str } from '../context.ts';
 import {
@@ -13,7 +13,9 @@ import {
 	get_bsky_app_url,
 	get_collection_ns,
 	get_post_url,
+	get_relative_url,
 	get_repo_id,
+    uri_to_postref,
 } from '../utils/url.ts';
 
 import type { EmbeddedImage, EmbeddedRecord, EmbeddedVideo, ExtendedEmbed } from '../utils/embed.ts';
@@ -22,6 +24,7 @@ import FeedPost from '../components/FeedPost.tsx';
 import Page from '../components/Page.tsx';
 import PermalinkPost from '../components/PermalinkPost.tsx';
 import ReplyTree from '../components/ReplyTree.tsx';
+import { format_long } from '../intl/number.ts';
 
 const MAX_ANCESTORS = 6;
 
@@ -40,10 +43,12 @@ export function ThreadPage(
 	ctx: ContextMap,
 	graph: PostGraphMap,
 	posts: AllPostsMap,
+	quotes: QuotesMap,
 	path: string,
 ) {
 	const did = get_repo_id(uri) as At.DID;
 	const archive = ctx.get(did) as ContextData;
+	const uri_quotes = quotes.get(uri) || [];
 
 	let top_uri = uri;
 	let top_post = post;
@@ -122,7 +127,7 @@ export function ThreadPage(
 
 	return (
 		<Page
-			title={get_title(archive.profile, post)}
+			title={`${archive.profile.displayName || `@${archive.profile.handle}`}: "${post.text}"`}
 			head={get_embed_head(archive, post, path)}
 			ctx={ctx}
 			path={path}
@@ -199,6 +204,19 @@ export function ThreadPage(
 
 			<PermalinkPost post={post} ctx={ctx} archive={archive} path={path} />
 
+			{uri_quotes.length > 0 ? (
+				<div class="ThreadPage__quoteContainer">
+					<hr />
+					<a
+                        href={get_relative_url(`/quotes/${uri_to_postref(uri)}/1.html`, path)}
+						class="ThreadPage__quoteInfo"
+					>
+						<span class="ThreadPage__quoteCount">{format_long(uri_quotes.length)}</span>
+						<span>{uri_quotes.length === 1 ? `quote` : `quotes`}</span>
+					</a>
+				</div>
+			) : null}
+
 			<hr />
 
 			<div class="ThreadPage__descendants">
@@ -218,10 +236,6 @@ export function ThreadPage(
 			</div>
 		</Page>
 	);
-}
-
-function get_title(author: AppBskyActorDefs.ProfileViewBasic, post: AppBskyFeedPost.Record): string {
-	return `${author.displayName || `@${author.handle}`}: "${post.text}"`;
 }
 
 function get_embed_head(archive: ContextData, post: AppBskyFeedPost.Record, path: string): JSXNode {

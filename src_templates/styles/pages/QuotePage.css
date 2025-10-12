@@ -1,0 +1,67 @@
+.QuotePage__quoteHeader {
+	@apply flex flex-col items-stretch gap-[8px] py-[8px];
+}
+.QuotePage__quoteHeader > hr {
+	@apply border-neutral-800;
+}
+
+
+.QuotePage__headerText {
+	@apply flex flex-col;
+}
+.QuotePage__quoteTitleRow {
+	@apply flex items-center gap-[8px] px-[16px];
+}
+.QuotePage__backIcon {
+	@apply h-[20px] w-[20px] text-neutral-400 transition-colors;
+	transform: rotate(180deg);
+}
+.QuotePage__backIcon:hover {
+	@apply text-neutral-200;
+}
+
+.QuotePage__quoteTitle {
+	@apply text-[16px] font-semibold text-neutral-100 leading-tight;
+}
+.QuotePage__quoteCount {
+	@apply text-[14px] text-neutral-500;
+}
+
+.QuotePage__feed {
+	@apply flex flex-col gap-[16px] py-[16px];
+}
+.QuotePage__feedSeparator {
+	@apply mx-[16px];
+}
+
+.QuotePage__pagination {
+	@apply flex flex-wrap items-center justify-center gap-[8px] p-[16px];
+}
+.QuotePage__page {
+	@apply rounded px-[10px] py-[4px] font-medium proportional-nums;
+}
+.QuotePage__page--active {
+	@apply bg-neutral-700;
+}
+.QuotePage__page--disabled {
+	@apply text-neutral-500/100;
+}
+.QuotePage__pageIcon {
+	@apply mx-[-6px] h-[20px] w-[20px];
+}
+.QuotePage__pageIcon--prev {
+	rotate: 180deg;
+}
+
+.QuotePage__pageInput {
+	padding: 0px 0px;
+}
+.QuotePage__pageInput > .pageInput {
+	width: 2.5em;
+	text-align: center;
+	background: transparent;
+	border: none;
+	border-radius: 0.25em;
+	height: 1.4em;
+	color: inherit;
+}

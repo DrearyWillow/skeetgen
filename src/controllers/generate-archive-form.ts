@@ -20,8 +20,18 @@ import { untar, write_tar_entry } from '../utils/tar.ts';
 
 import { get_blob_str, render_page, type ContextData, type ContextMap } from '../templates/context.ts';
 import { chunked } from '../templates/utils/misc.ts';
-import { create_posts_graph, type AllPostsMap, type PostGraphMap } from '../templates/utils/posts.ts';
-import { get_tid_segment, make_bsky_post_aturi, sanitize_did } from '../templates/utils/url.ts';
+import {
+	create_posts_graph,
+	type AllPostsMap,
+	type PostGraphMap,
+	type QuotesMap,
+} from '../templates/utils/posts.ts';
+import {
+	get_tid_segment,
+	make_bsky_post_aturi,
+	sanitize_did,
+	uri_to_postref,
+} from '../templates/utils/url.ts';
 
 import { SearchPage } from '../templates/pages/SearchPage.tsx';
 import { ThreadPage } from '../templates/pages/ThreadPage.tsx';
@@ -33,6 +43,7 @@ import {
 import { WelcomePage } from '../templates/pages/WelcomePage.tsx';
 import type { ExtendedEmbed } from '../templates/utils/embed.ts';
 import { ProfilePage } from '../templates/pages/ProfilePage.tsx';
+import { QuotePage } from '../templates/pages/QuotePage.tsx';
 
 const supports_fsa = 'showDirectoryPicker' in globalThis;
 
@@ -577,6 +588,7 @@ class GenerateArchiveForm extends HTMLElement {
 		ctx: ContextMap,
 		graph: PostGraphMap,
 		posts: AllPostsMap,
+		quotes: QuotesMap,
 	) {
 		signal.throwIfAborted();
 
@@ -591,10 +603,61 @@ class GenerateArchiveForm extends HTMLElement {
 				await writable.write(
 					write_tar_entry({
 						filename: path,
-						data: render_page(ThreadPage(uri, post, ctx, graph, posts, `/${path}`)),
+						data: render_page(ThreadPage(uri, post, ctx, graph, posts, quotes, `/${path}`)),
 					}),
 				);
 			}
+		}
+	}
+
+	async render_quote_pages(
+		signal: AbortSignal,
+		writable: FileSystemWritableFileStream,
+		ctx: ContextMap,
+		graph: PostGraphMap,
+		posts: AllPostsMap,
+		quotes: QuotesMap,
+	) {
+		signal.throwIfAborted();
+
+		// for (const [uri, quote_uris] of quotes) {
+		// 	const path = `quotes/${uri_to_postref(uri)}.html`;
+		// 	await writable.write(
+		// 		write_tar_entry({
+		// 			filename: path,
+		// 			data: render_page(QuotePage(uri, quote_uris, ctx, graph, posts, `/${path}`)),
+		// 		}),
+		// 	);
+		// }
+
+        for (const [uri, quote_uris] of quotes) {
+			const pages = chunked(quote_uris, 50)
+
+            // Push an empty page
+			if (pages.length === 0) {
+				pages.push([]);
+			}
+
+            for (let i = 0, ilen = pages.length; i < ilen; i++) {
+				const page = pages[i];
+
+                const path = `quotes/${uri_to_postref(uri)}/${i + 1}.html`;
+                await writable.write(
+                    write_tar_entry({
+                        filename: path,
+                        data: render_page(QuotePage({
+                            uri: uri,
+                            quote_uris: page,
+                            total_quotes: quote_uris.length,
+                            current_page: i + 1,
+                            total_pages: ilen,
+                            ctx: ctx,
+                            graph: graph,
+                            posts: posts,
+                            path: `/${path}`})),
+                    }),
+                );
+            }
 		}
 	}
 
@@ -627,11 +690,15 @@ class GenerateArchiveForm extends HTMLElement {
 
 		try {
 			// set up context for rendering pages
-			const { graph, posts } = create_posts_graph(ctx);
+			const { graph, posts, quotes } = create_posts_graph(ctx);
 
 			// render individual threads (separate)
 			$status.textContent = `Rendering threads`;
-			await this.render_individual_threads(signal, writable, ctx, graph, posts);
+			await this.render_individual_threads(signal, writable, ctx, graph, posts, quotes);
+
+			// render quotes (separate)
+			$status.textContent = `Rendering quotes`;
+			await this.render_quote_pages(signal, writable, ctx, graph, posts, quotes);
 
 			// render individual profiles (separate)
 			$status.textContent = `Rendering profiles`;

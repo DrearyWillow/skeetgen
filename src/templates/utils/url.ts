@@ -96,7 +96,7 @@ export function sanitize_did(did: At.DID) {
 
 export function postref_to_uri(postref: string) {
 	const parts = postref.split('/');
-	const did = parts.shift()?.replace('_', ':') as At.DID;
+	const did = parts.shift()?.replaceAll('_', ':') as At.DID;
 	const rkey = parts.join('');
 
 	return make_bsky_post_aturi(did, rkey);

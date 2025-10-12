@@ -6,10 +6,11 @@ changes:
 
 - supports multiple repos
 - adds profile pages
+- adds quote pages
 - adds video support
 - adds alt text search
 - adds alt text button (uses js, probably warrants more consideration as a deviation)
-- adds page input buttons
+- adds page input buttons (uses js)
 - adds execute permissions to blob directory so images can be loaded properly
 - adds handling for post records without text (will not cause the import to fail)
 - fixes timeline page title off by one error
@@ -20,7 +21,7 @@ maybe i'll clean it up next weekend (clueless).
 
 ## TODO
 
-- more powerful search (from:, until:, since:, domain:?, replyto:?, blob:cid)
+- more powerful search (from:, until:, since:, domain:?, replyto:?, blob:cid, hashtags? [pretty sure we can just rely on `#hashtag` string])
   - from: should support did as well as handle because of the multi-handle or no-handle problem
   - consider modifying search to tokenize forward or full
     - maybe conditionally switch to a separate flexsearch document if the search string contains "\*" or something
@@ -40,15 +41,16 @@ maybe i'll clean it up next weekend (clueless).
       - less modular
       - more messy
       - less flexible: will have to go back and change context code every time you want a new data item
-- less terrible variable names (specifically, archive in ctx, overlay -> modal)
+- less terrible variable names (specifically, archive in ctx, overlay -> modal, allposts)
 - add image modal on click (alt text?)
 - add props back to the functions i inexplicably tore them out of
 - look back at mary's ~~image~~ css, mine is ugly
 - did i break something with thread views? some replies without parents despite being same-user?
 - ensure de-dupe works okay if two identical repos are entered
-- quotes page
 - color scheme (pink yay)
 - don't render videos in timeline quotes (too small), thumbnail should be fine?
+- update no js warnings
+- update attribution links
 
 ## Usage
 

@@ -53,3 +53,13 @@
 .ThreadCut__actionSeparator {
 	@apply select-none;
 }
+
+.ThreadPage__quoteInfo {
+	@apply inline-flex items-center gap-1 text-neutral-500 px-[16px] py-[12px];
+}
+.ThreadPage__quoteCount {
+	@apply font-semibold text-neutral-100;
+}
+.ThreadPage__quoteInfo:hover {
+	@apply underline;
+}
