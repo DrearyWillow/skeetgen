@@ -43,7 +43,6 @@ maybe i'll clean it up next weekend (clueless).
       - less flexible: will have to go back and change context code every time you want a new data item
 - less terrible variable names (specifically, archive in ctx, overlay -> modal, allposts)
 - add image modal on click (alt text?)
-- add props back to the functions i inexplicably tore them out of
 - look back at mary's ~~image~~ css, mine is ugly
 - did i break something with thread views? some replies without parents despite being same-user?
 - ensure de-dupe works okay if two identical repos are entered

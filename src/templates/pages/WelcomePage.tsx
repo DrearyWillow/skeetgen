@@ -4,7 +4,12 @@ import Page from '../components/Page.tsx';
 import type { ContextMap } from '../context.ts';
 import { get_relative_url, sanitize_did } from '../utils/url.ts';
 
-export function WelcomePage(ctx: ContextMap, path: string) {
+export interface WelcomePageProps {
+	ctx: ContextMap;
+	path: string;
+}
+
+export function WelcomePage({ ctx, path }: WelcomePageProps) {
 	let root_amount = 0;
 	let replies_amount = 0;
 	let post_amount = 0;

@@ -22,11 +22,16 @@ type MinimumProfile = {
 	did: At.DID;
 };
 
+export interface SearchPageProps {
+	ctx: ContextMap;
+	path: string;
+}
+
 type PostEntry = [rkey: string, text: string, ts: number, flag: number, alt: string, profile: MinimumProfile];
 
 const is_nan = Number.isNaN;
 
-export function SearchPage(ctx: ContextMap, path: string) {
+export function SearchPage({ ctx, path }: SearchPageProps) {
 	const entries: PostEntry[] = [];
 
 	{

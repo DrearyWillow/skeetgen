@@ -37,15 +37,17 @@ const enum ExternalReply {
 	YES,
 }
 
-export function ThreadPage(
-	uri: At.Uri,
-	post: AppBskyFeedPost.Record,
-	ctx: ContextMap,
-	graph: PostGraphMap,
-	posts: AllPostsMap,
-	quotes: QuotesMap,
-	path: string,
-) {
+export interface ThreadPageProps {
+	uri: At.Uri;
+	post: AppBskyFeedPost.Record;
+	ctx: ContextMap;
+	graph: PostGraphMap;
+	posts: AllPostsMap;
+	quotes: QuotesMap;
+	path: string;
+}
+
+export function ThreadPage({ uri, post, ctx, graph, posts, quotes, path }: ThreadPageProps) {
 	const did = get_repo_id(uri) as At.DID;
 	const archive = ctx.get(did) as ContextData;
 	const uri_quotes = quotes.get(uri) || [];

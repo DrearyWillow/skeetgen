@@ -577,7 +577,7 @@ class GenerateArchiveForm extends HTMLElement {
 		await writable.write(
 			write_tar_entry({
 				filename: path,
-				data: render_page(WelcomePage(ctx, `/${path}`)),
+				data: render_page(WelcomePage({ ctx: ctx, path: `/${path}` })),
 			}),
 		);
 	}
@@ -603,7 +603,17 @@ class GenerateArchiveForm extends HTMLElement {
 				await writable.write(
 					write_tar_entry({
 						filename: path,
-						data: render_page(ThreadPage(uri, post, ctx, graph, posts, quotes, `/${path}`)),
+						data: render_page(
+							ThreadPage({
+								uri: uri,
+								post: post,
+								ctx: ctx,
+								graph: graph,
+								posts: posts,
+								quotes: quotes,
+								path: `/${path}`,
+							}),
+						),
 					}),
 				);
 			}
@@ -619,16 +629,6 @@ class GenerateArchiveForm extends HTMLElement {
 		quotes: QuotesMap,
 	) {
 		signal.throwIfAborted();
-
-		// for (const [uri, quote_uris] of quotes) {
-		// 	const path = `quotes/${uri_to_postref(uri)}.html`;
-		// 	await writable.write(
-		// 		write_tar_entry({
-		// 			filename: path,
-		// 			data: render_page(QuotePage(uri, quote_uris, ctx, graph, posts, `/${path}`)),
-		// 		}),
-		// 	);
-		// }
 
 		for (const [uri, quote_uris] of quotes) {
 			const pages = chunked(quote_uris, 50);
@@ -671,7 +671,7 @@ class GenerateArchiveForm extends HTMLElement {
 		await writable.write(
 			write_tar_entry({
 				filename: path,
-				data: render_page(SearchPage(ctx, `/${path}`)),
+				data: render_page(SearchPage({ ctx: ctx, path: `/${path}` })),
 			}),
 		);
 	}
