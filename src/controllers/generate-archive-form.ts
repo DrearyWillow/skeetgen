@@ -630,34 +630,37 @@ class GenerateArchiveForm extends HTMLElement {
 		// 	);
 		// }
 
-        for (const [uri, quote_uris] of quotes) {
-			const pages = chunked(quote_uris, 50)
+		for (const [uri, quote_uris] of quotes) {
+			const pages = chunked(quote_uris, 50);
 
-            // Push an empty page
+			// Push an empty page
 			if (pages.length === 0) {
 				pages.push([]);
 			}
 
-            for (let i = 0, ilen = pages.length; i < ilen; i++) {
+			for (let i = 0, ilen = pages.length; i < ilen; i++) {
 				const page = pages[i];
 
-                const path = `quotes/${uri_to_postref(uri)}/${i + 1}.html`;
-                await writable.write(
-                    write_tar_entry({
-                        filename: path,
-                        data: render_page(QuotePage({
-                            uri: uri,
-                            quote_uris: page,
-                            total_quotes: quote_uris.length,
-                            current_page: i + 1,
-                            total_pages: ilen,
-                            ctx: ctx,
-                            graph: graph,
-                            posts: posts,
-                            path: `/${path}`})),
-                    }),
-                );
-            }
+				const path = `quotes/${uri_to_postref(uri)}/${i + 1}.html`;
+				await writable.write(
+					write_tar_entry({
+						filename: path,
+						data: render_page(
+							QuotePage({
+								uri: uri,
+								quote_uris: page,
+								total_quotes: quote_uris.length,
+								current_page: i + 1,
+								total_pages: ilen,
+								ctx: ctx,
+								graph: graph,
+								posts: posts,
+								path: `/${path}`,
+							}),
+						),
+					}),
+				);
+			}
 		}
 	}
 

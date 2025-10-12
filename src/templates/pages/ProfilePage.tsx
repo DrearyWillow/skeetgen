@@ -111,6 +111,8 @@ export function ProfilePage({
 				/>
 			</div>
 
+			<hr />
+
 			<div class="ProfilePage__feed">
 				{repeat(slices, (slice, idx) => {
 					return (

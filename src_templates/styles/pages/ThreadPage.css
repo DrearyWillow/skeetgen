@@ -55,7 +55,7 @@
 }
 
 .ThreadPage__quoteInfo {
-	@apply inline-flex items-center gap-1 text-neutral-500 px-[16px] py-[12px];
+	@apply inline-flex items-center gap-1 px-[16px] py-[12px] text-neutral-500;
 }
 .ThreadPage__quoteCount {
 	@apply font-semibold text-neutral-100;

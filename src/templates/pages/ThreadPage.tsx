@@ -15,7 +15,7 @@ import {
 	get_post_url,
 	get_relative_url,
 	get_repo_id,
-    uri_to_postref,
+	uri_to_postref,
 } from '../utils/url.ts';
 
 import type { EmbeddedImage, EmbeddedRecord, EmbeddedVideo, ExtendedEmbed } from '../utils/embed.ts';
@@ -208,7 +208,7 @@ export function ThreadPage(
 				<div class="ThreadPage__quoteContainer">
 					<hr />
 					<a
-                        href={get_relative_url(`/quotes/${uri_to_postref(uri)}/1.html`, path)}
+						href={get_relative_url(`/quotes/${uri_to_postref(uri)}/1.html`, path)}
 						class="ThreadPage__quoteInfo"
 					>
 						<span class="ThreadPage__quoteCount">{format_long(uri_quotes.length)}</span>

@@ -12,7 +12,7 @@ import { create_pagination } from '../utils/pagination';
 export interface QuotePageProps {
 	uri: At.Uri;
 	quote_uris: At.Uri[];
-    total_quotes: number;
+	total_quotes: number;
 	current_page: number;
 	total_pages: number;
 	ctx: ContextMap;
@@ -24,7 +24,7 @@ export interface QuotePageProps {
 export function QuotePage({
 	uri,
 	quote_uris,
-    total_quotes,
+	total_quotes,
 	current_page,
 	total_pages,
 	ctx,
@@ -78,83 +78,87 @@ export function QuotePage({
 			</div>
 
 			{total_pages > 1 ? (
-                <>
-                    <div class="QuotePage__pagination">
-                        {repeat(pagination, (val) => {
-                            if (typeof val === 'number') {
-                                return (
-                                    <a
-                                        aria-label={`Go to page ${val}`}
-                                        href={get_relative_url(`${pathdir}/${val}.html`, path)}
-                                        class={
-                                            'Interactive QuotePage__page Interactive--primary' +
-                                            (val === current_page ? ' QuotePage__page--active' : '')
-                                        }
-                                    >
-                                        {val}
-                                    </a>
-                                );
-                            }
+				<>
+					<div class="QuotePage__pagination">
+						{repeat(pagination, (val) => {
+							if (typeof val === 'number') {
+								return (
+									<a
+										aria-label={`Go to page ${val}`}
+										href={get_relative_url(`${pathdir}/${val}.html`, path)}
+										class={
+											'Interactive QuotePage__page Interactive--primary' +
+											(val === current_page ? ' QuotePage__page--active' : '')
+										}
+									>
+										{val}
+									</a>
+								);
+							}
 
-                            if (val === 'prev') {
-                                const disabled = current_page <= 1;
+							if (val === 'prev') {
+								const disabled = current_page <= 1;
 
-                                return (
-                                    <a
-                                        title={!disabled ? `Go to previous page` : undefined}
-                                        href={!disabled ? get_relative_url(`${pathdir}/${current_page - 1}.html`, path) : undefined}
-                                        class={
-                                            'QuotePage__page' +
-                                            (!disabled ? ' Interactive Interactive--primary' : ' QuotePage__page--disabled')
-                                        }
-                                    >
-                                        <svg class="QuotePage__pageIcon QuotePage__pageIcon--prev" viewBox="0 0 24 24">
-                                            <path fill="currentColor" d="M10 6L8.59 7.41L13.17 12l-4.58 4.59L10 18l6-6z" />
-                                        </svg>
-                                    </a>
-                                );
-                            }
+								return (
+									<a
+										title={!disabled ? `Go to previous page` : undefined}
+										href={
+											!disabled ? get_relative_url(`${pathdir}/${current_page - 1}.html`, path) : undefined
+										}
+										class={
+											'QuotePage__page' +
+											(!disabled ? ' Interactive Interactive--primary' : ' QuotePage__page--disabled')
+										}
+									>
+										<svg class="QuotePage__pageIcon QuotePage__pageIcon--prev" viewBox="0 0 24 24">
+											<path fill="currentColor" d="M10 6L8.59 7.41L13.17 12l-4.58 4.59L10 18l6-6z" />
+										</svg>
+									</a>
+								);
+							}
 
-                            if (val === 'next') {
-                                const disabled = current_page >= total_pages;
+							if (val === 'next') {
+								const disabled = current_page >= total_pages;
 
-                                return (
-                                    <a
-                                        title={!disabled ? `Go to next page` : undefined}
-                                        href={!disabled ? get_relative_url(`${pathdir}/${current_page + 1}.html`, path) : undefined}
-                                        class={
-                                            'QuotePage__page' +
-                                            (!disabled ? ' Interactive Interactive--primary' : ' QuotePage__page--disabled')
-                                        }
-                                    >
-                                        <svg class="QuotePage__pageIcon QuotePage__pageIcon--next" viewBox="0 0 24 24">
-                                            <path fill="currentColor" d="M10 6L8.59 7.41L13.17 12l-4.58 4.59L10 18l6-6z" />
-                                        </svg>
-                                    </a>
-                                );
-                            }
+								return (
+									<a
+										title={!disabled ? `Go to next page` : undefined}
+										href={
+											!disabled ? get_relative_url(`${pathdir}/${current_page + 1}.html`, path) : undefined
+										}
+										class={
+											'QuotePage__page' +
+											(!disabled ? ' Interactive Interactive--primary' : ' QuotePage__page--disabled')
+										}
+									>
+										<svg class="QuotePage__pageIcon QuotePage__pageIcon--next" viewBox="0 0 24 24">
+											<path fill="currentColor" d="M10 6L8.59 7.41L13.17 12l-4.58 4.59L10 18l6-6z" />
+										</svg>
+									</a>
+								);
+							}
 
-                            if (val === 'dots_start' || val === 'dots_end') {
-                                return (
-                                    <div class="QuotePage__page QuotePage__page--disabled QuotePage__pageInput">
-                                        <input
-                                            type="text"
-                                            inputmode="numeric"
-                                            min="1"
-                                            max={total_pages}
-                                            placeholder="…"
-                                            class="pageInput"
-                                            name="pageInput"
-                                        />
-                                    </div>
-                                );
-                            }
+							if (val === 'dots_start' || val === 'dots_end') {
+								return (
+									<div class="QuotePage__page QuotePage__page--disabled QuotePage__pageInput">
+										<input
+											type="text"
+											inputmode="numeric"
+											min="1"
+											max={total_pages}
+											placeholder="…"
+											class="pageInput"
+											name="pageInput"
+										/>
+									</div>
+								);
+							}
 
-                            return null;
-                        })}
-                    </div>
-                    <script src={get_asset_url('page-input.js', ctx, path)}></script>
-                </>
+							return null;
+						})}
+					</div>
+					<script src={get_asset_url('page-input.js', ctx, path)}></script>
+				</>
 			) : null}
 
 			<hr />

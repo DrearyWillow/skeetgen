@@ -29,7 +29,7 @@
 }
 
 .TimelinePage__pageInput {
-	padding: 0px 0px;
+	@apply p-[0px];
 }
 .TimelinePage__pageInput > .pageInput {
 	width: 2.5em;

@@ -1,6 +1,5 @@
 document.querySelectorAll('.pageInput').forEach((input) => {
 	input.addEventListener('keydown', (e) => {
-
 		const allowed = ['Enter', 'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
 		if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) {
 			e.preventDefault();

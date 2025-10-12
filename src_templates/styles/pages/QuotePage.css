@@ -5,7 +5,6 @@
 	@apply border-neutral-800;
 }
 
-
 .QuotePage__headerText {
 	@apply flex flex-col;
 }
@@ -21,7 +20,7 @@
 }
 
 .QuotePage__quoteTitle {
-	@apply text-[16px] font-semibold text-neutral-100 leading-tight;
+	@apply text-[16px] font-semibold leading-tight text-neutral-100;
 }
 .QuotePage__quoteCount {
 	@apply text-[14px] text-neutral-500;

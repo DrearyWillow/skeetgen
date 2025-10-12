@@ -53,6 +53,8 @@ export function TimelinePage({
 				<FilterButton type="videos" active={type === 'videos'} path={path} />
 			</div>
 
+			<hr />
+
 			<div class="TimelinePage__feed">
 				{repeat(slices, (slice, idx) => {
 					return (
