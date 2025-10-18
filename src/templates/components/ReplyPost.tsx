@@ -1,13 +1,11 @@
 import type { AppBskyFeedPost, At } from '@mary/bluesky-client/lexicons';
 
-// import { get_page_context } from '../context.ts';
 import { format_abs_date, format_abs_date_time } from '../intl/time.ts';
-import { get_blob_url, get_post_url, get_relative_url, sanitize_did } from '../utils/url.ts';
+import { get_blob_url, get_post_url, get_relative_url, get_repo_id, sanitize_did } from '../utils/url.ts';
 
 import Embed from './Embed.tsx';
 import RichTextRenderer from './RichTextRenderer.tsx';
-import type { ContextMap } from '../context.ts';
-import type { ContextData } from '../context.ts';
+import type { ContextMap, ContextData } from '../context.ts';
 
 export interface ReplyPostProps {
 	uri: At.Uri;
@@ -15,11 +13,12 @@ export interface ReplyPostProps {
 	has_children: boolean;
 	has_parent: boolean;
 	ctx: ContextMap;
-	archive: ContextData;
 	path: string;
 }
 
-function ReplyPost({ uri, post, has_children, has_parent, ctx, archive, path }: ReplyPostProps) {
+function ReplyPost({ uri, post, has_children, has_parent, ctx, path }: ReplyPostProps) {
+	const archive = ctx.get(get_repo_id(uri)) as ContextData;
+
 	const profile_page_url = get_relative_url(
 		`/profile/${sanitize_did(archive.profile.did)}/posts/1.html`,
 		path,

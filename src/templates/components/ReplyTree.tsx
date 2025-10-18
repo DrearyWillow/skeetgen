@@ -1,9 +1,7 @@
 import type { AppBskyFeedPost, At } from '@mary/bluesky-client/lexicons';
 import { repeat } from '@intrnl/jsx-to-string';
 
-// import { get_page_context } from '../context.ts';
 import { get_post_url } from '../utils/url.ts';
-
 import ReplyPost from './ReplyPost.tsx';
 import type { ContextMap } from '../context.ts';
 import type { ContextData } from '../context.ts';
@@ -81,7 +79,6 @@ function ReplyTree({ uri, post, depth, has_next, ctx, archive, path, graph, post
 				has_children={children.length > 0}
 				has_parent={depth > 0}
 				ctx={ctx}
-				archive={archive}
 				path={path}
 			/>
 
