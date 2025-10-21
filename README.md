@@ -23,8 +23,11 @@ maybe i'll clean it up next weekend (clueless).
 
 - more powerful search (from:, until:, since:, domain:?, replyto:?, blob:cid, hashtags? [pretty sure we can just rely on `#hashtag` string])
   - from: should support did as well as handle because of the multi-handle or no-handle problem
+  - weird sorting rn, maybe paramaterize? maybe move sort into filter? process_results?
+  - too many kasey results in the thing, dunno why
   - consider modifying search to tokenize forward or full
     - maybe conditionally switch to a separate flexsearch document if the search string contains "\*" or something
+- threadpage parent uri broken a little, need to fix
 - alt text link chips (like [drearycore](https://github.com/DrearyWillow/drearycore))
 - add clickable links inside of alt text modal
 - revert context params to get_page_context, or subsume into one context param
@@ -41,7 +44,7 @@ maybe i'll clean it up next weekend (clueless).
       - less modular
       - more messy
       - less flexible: will have to go back and change context code every time you want a new data item
-- less terrible variable names (specifically, archive in ctx, overlay -> modal, allposts)
+- less terrible variable names (specifically, archive in ctx, overlay -> modal, allposts, page-picker)
 - add image modal on click (alt text?)
 - look back at mary's ~~image~~ css, mine is ugly
 - did i break something with thread views? some replies without parents despite being same-user?

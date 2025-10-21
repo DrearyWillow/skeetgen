@@ -18,21 +18,32 @@ import { app, h, memo, text } from './dependencies/hyperapp.js';
  * )} PostEntry
  */
 
+const PostEntryField = Object.freeze({
+	RKEY: 0,
+	TEXT: 1,
+	TIMESTAMP: 2,
+	FLAGS: 3,
+	ALT: 4,
+	PROFILE: 5,
+});
+
 /** @type {FlexSearch.Document<PostEntry, true>} */
 const index = new FlexSearch.Document({
 	document: {
 		id: '0',
-		index: ['1', '4'], // post text and alt text
+		index: [PostEntryField.TEXT.toString(), PostEntryField.ALT.toString()],
+		// index: ['1', '4'], // post text and alt text
 		store: true,
 	},
 	// tokenize: 'forward', // 'full'
 });
 
+// Initialize entries array outside scope to not get cleaned up
+/** @type {PostEntry[]} */
+let entries;
+
 // Add posts to document
 {
-	/** @type {PostEntry[]} */
-	let entries;
-
 	// Grab the JSON that's been embedded into the page
 	{
 		/** @type {HTMLScriptElement} */
@@ -89,7 +100,9 @@ const index = new FlexSearch.Document({
 					'div',
 					{},
 					results.map((item) =>
-						h('div', { class: 'SearchItem', key: item[0] }, [memo(render_search_item, { item: item })]),
+						h('div', { class: 'SearchItem', key: item[PostEntryField.RKEY] }, [
+							memo(render_search_item, { item: item }),
+						]),
 					),
 				),
 			]);
@@ -104,7 +117,21 @@ const index = new FlexSearch.Document({
 	}
 
 	function handle_search_input(ev) {
-		const [search_results] = index.search(ev.target.value, 200, { enrich: true });
+		const parsed = parse_query(ev.target.value);
+
+		if (parsed.skip_search) {
+			results = JSON.parse(JSON.stringify(entries));
+
+			if (sort !== SORT_RELEVANT) {
+				results = sort_results();
+			}
+
+			results = filter_results(parsed.params);
+
+			return rerender();
+		}
+
+		const [search_results] = index.search(parsed.query, { enrich: true });
 
 		results = [];
 
@@ -118,20 +145,175 @@ const index = new FlexSearch.Document({
 			}
 
 			if (sort !== SORT_RELEVANT) {
-				sort_results();
+				results = sort_results();
 			}
+
+			results = filter_results(parsed.params);
 		}
+
+        console.log(results)
 
 		rerender();
 	}
 
+	function split_respecting_quotes(raw) {
+		let quoted = false;
+		let current = '';
+		const parts = [];
+
+		for (const char of raw) {
+			if (char === '"') {
+				quoted = !quoted;
+				current += char;
+			} else if (char === ' ' && !quoted) {
+				if (current) {
+					parts.push(current);
+					current = '';
+				}
+			} else {
+				current += char;
+			}
+		}
+
+		if (current) parts.push(current);
+		return parts;
+	}
+
+	function parse_query(query) {
+		// https://github.com/bluesky-social/indigo/blob/main/search/parse_query.go
+		// loosely based on palomar
+
+		const parts = split_respecting_quotes(query);
+
+		const params = {
+			handles: [],
+			authors: [],
+			replyto: [],
+			urls: [],
+			domains: [],
+			exclusions: [],
+            since: null,
+            until: null,
+		};
+
+		const keep = [];
+		for (const p of parts) {
+			// pass-through quoted segments
+			if (p.startsWith('"')) {
+				keep.push(p);
+				continue;
+			}
+
+			// handle - i treat like author, bsky treats like mention
+			if (p.startsWith('@') && p.length > 1) {
+				params.handles.push(p.slice(1));
+				continue;
+			}
+
+			// `-` prefix negates a single keyword
+			if (p.startsWith('-') && p.length > 1) {
+				params.exclusions.push(p.slice(1));
+				continue;
+			}
+
+			// parse tokens
+			const tok_parts = p.split(':');
+			if (tok_parts.length === 1) {
+				keep.push(p);
+				continue;
+			}
+
+			switch (tok_parts[0]) {
+				case 'did':
+					params.authors.push(p);
+					continue;
+				case 'from':
+					params.handles.push(tok_parts[1]);
+					continue;
+				case 'replyto':
+					params.replyto.push(tok_parts[1]);
+					continue;
+                case 'http':
+                case 'https':
+					params.urls.push(p);
+					continue;
+				case 'domain':
+					params.domains.push(tok_parts[1]);
+					continue;
+				case 'since':
+                case 'until':
+                    // use local time on user input
+                    const ts = new Date(tok_parts[1] + "T00:00:00").getTime();
+				    if (isNaN(ts)) break;
+                    if (tok_parts[0] === 'since') {
+                        if (!params.since || params.since < ts) params.since = ts;
+                    } else if (tok_parts[0] === 'until') {
+                        if (!params.until || params.until > ts) params.until = ts;
+                    }
+                    continue
+			}
+
+			keep.push(p);
+		}
+
+		return {
+			query: keep.join(' '),
+			params: params,
+			skip_search: keep.length === 0 && query != '',
+		};
+	}
+
+	function filter_results(params, max_results = 200) {
+		const filtered = [];
+		const excludeSet = new Set(params.exclusions.map((w) => w.toLowerCase()));
+
+        console.log("params: ", params)
+        console.log("before filter results: ", results)
+
+		for (const item of results) {
+			// filter did author
+			if (params.authors.length > 0 && !params.authors.includes(item[PostEntryField.PROFILE].did)) {
+				continue;
+			}
+
+			// filter handle author
+			if (params.handles.length > 0 && !params.handles.includes(item[PostEntryField.PROFILE].handle)) {
+				continue;
+			}
+
+			// filter excluded words
+			if (params.exclusions.length > 0) {
+				const text_words = item[PostEntryField.TEXT].split(/\s+/);
+				const alt_words = item[PostEntryField.ALT].split(/\s+/);
+				const words = [...text_words, ...alt_words];
+				if (words.some((word) => excludeSet.has(word.toLowerCase()))) continue;
+			}
+
+			// TODO: replyto, domains, urls
+
+            if (params.since && item[PostEntryField.TIMESTAMP] < params.since) {
+                continue;
+            }
+
+            if (params.until && item[PostEntryField.TIMESTAMP] > params.until) {
+                continue;
+            }
+
+			filtered.push(item);
+
+			if (filtered.length >= max_results) break;
+		}
+
+		return filtered;
+	}
+
 	function sort_results() {
 		if (sort === SORT_RELEVANT) {
-			results.sort((a, b) => a.idx - b.idx);
+			return results.sort((a, b) => a.idx - b.idx);
 		} else if (sort === SORT_NEW) {
-			results.sort((a, b) => b[2] - a[2]);
+			return results.sort((a, b) => b[PostEntryField.TIMESTAMP] - a[PostEntryField.TIMESTAMP]);
 		} else if (sort === SORT_OLD) {
-			results.sort((a, b) => a[2] - b[2]);
+			return results.sort((a, b) => a[PostEntryField.TIMESTAMP] - b[PostEntryField.TIMESTAMP]);
 		}
 	}
 

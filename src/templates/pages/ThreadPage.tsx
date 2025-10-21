@@ -108,6 +108,9 @@ export function ThreadPage({ uri, post, ctx, graph, posts, quotes, path }: Threa
 	{
 		const reply = top_post.reply;
 
+        // parent uri links not working, need to debug
+        // const debug = "at://did:plc:aokggmp5jzj4nc5jifhiplqc/3lzw4ay7fbs2d"
+
 		if (reply !== undefined) {
 			{
 				const parent_uri = reply.parent.uri;
