@@ -111,7 +111,7 @@ export function ThreadPage({ uri, post, ctx, graph, posts, quotes, path }: Threa
 		if (reply !== undefined) {
 			{
 				const parent_uri = reply.parent.uri;
-				top_uri = parent_uri
+                if (!is_ancestor_overflowing) top_uri = parent_uri
 				const repo = get_repo_id(parent_uri);
 
 				reply_state = ctx.has(repo) ? ExternalReply.SAME_USER : ExternalReply.YES;
