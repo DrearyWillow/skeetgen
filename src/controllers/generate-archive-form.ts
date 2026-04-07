@@ -158,27 +158,29 @@ class GenerateArchiveForm extends HTMLElement {
 		let count = 0;
 
 		for (const [did, archive] of ctx) {
-			const stream = archive.archive.stream();
-			const reader = create_iterable_reader(iterate_stream(stream));
+			for (const blob of archive.archives) {
+				const stream = blob.stream();
+				const reader = create_iterable_reader(iterate_stream(stream));
 
-			for await (const entry of untar(reader)) {
-				signal.throwIfAborted();
+				for await (const entry of untar(reader)) {
+					signal.throwIfAborted();
 
-				if (entry.name.startsWith('blobs/')) {
-					const buffer = new Uint8Array(entry.size);
+					if (entry.name.startsWith('blobs/')) {
+						const buffer = new Uint8Array(entry.size);
 
-					await entry.read(buffer);
-					const sanitized_did = sanitize_did(did);
-					const filename = entry.name.replace('blobs/', `blobs/${sanitized_did}/`);
-					await writable.write(write_tar_entry({ filename: filename, data: buffer }));
+						await entry.read(buffer);
+						const sanitized_did = sanitize_did(did);
+						const filename = entry.name.replace('blobs/', `blobs/${sanitized_did}/`);
+						await writable.write(write_tar_entry({ filename: filename, data: buffer }));
 
-					count++;
+						count++;
 
-					if (log) {
-						log = false;
-						$status.textContent = `Copying media files (${count} copied)`;
+						if (log) {
+							log = false;
+							$status.textContent = `Copying media files (${count} copied)`;
 
-						setTimeout(() => (log = true), 500);
+							setTimeout(() => (log = true), 500);
+						}
 					}
 				}
 			}
@@ -497,25 +499,36 @@ class GenerateArchiveForm extends HTMLElement {
 			const handles = did.alsoKnownAs?.filter((uri) => uri.startsWith('at://')).map((uri) => uri.slice(5));
 			const sanitized_did = sanitize_did(did.id as At.DID);
 
-			ctx.set(did.id as At.DID, {
-				posts_dir: `/posts/${sanitized_did}`,
-				blob_dir: `/blobs/${sanitized_did}`,
-				asset_dir: `/assets`, // assets are shared
-				records: {
-					feeds: feeds,
-					lists: lists,
-					posts: posts,
-					threadgates: threadgates,
-					profile: profile,
-				},
-				archive: archive,
-				profile: {
-					did: did.id as At.DID,
-					handle: handles && handles.length > 0 ? handles[0] : 'handle.invalid',
-					displayName: profile?.displayName?.trim(),
-					avatar: profile?.avatar && get_blob_str(profile?.avatar),
-				},
-			});
+			const existing = ctx.get(did.id as At.DID);
+
+			if (existing !== undefined) {
+				for (const [rkey, record] of posts) existing.records.posts.set(rkey, record);
+				for (const [rkey, record] of feeds) existing.records.feeds.set(rkey, record);
+				for (const [rkey, record] of lists) existing.records.lists.set(rkey, record);
+				for (const [rkey, record] of threadgates) existing.records.threadgates.set(rkey, record);
+				if (profile !== undefined) existing.records.profile = profile;
+				existing.archives.push(archive);
+			} else {
+				ctx.set(did.id as At.DID, {
+					posts_dir: `/posts/${sanitized_did}`,
+					blob_dir: `/blobs/${sanitized_did}`,
+					asset_dir: `/assets`, // assets are shared
+					records: {
+						feeds: feeds,
+						lists: lists,
+						posts: posts,
+						threadgates: threadgates,
+						profile: profile,
+					},
+					archives: [archive],
+					profile: {
+						did: did.id as At.DID,
+						handle: handles && handles.length > 0 ? handles[0] : 'handle.invalid',
+						displayName: profile?.displayName?.trim(),
+						avatar: profile?.avatar && get_blob_str(profile?.avatar),
+					},
+				});
+			}
 
 			total_posts += posts.size;
 		}

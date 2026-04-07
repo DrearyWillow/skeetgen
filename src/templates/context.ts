@@ -27,7 +27,7 @@ export interface ContextData {
 
 	profile: AppBskyActorDefs.ProfileViewBasic;
 
-	archive: Blob;
+	archives: Blob[];
 }
 
 export type ContextMap = Map<At.DID, ContextData>;

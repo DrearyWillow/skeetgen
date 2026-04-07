@@ -30,6 +30,10 @@ maybe i'll clean it up next weekend (clueless).
 - threadpage parent uri broken a little, need to fix
 - alt text link chips (like [drearycore](https://github.com/DrearyWillow/drearycore))
 - add clickable links inside of alt text modal
+- @s should check if the repo is the archive set
+- home page should sort repos better (first post date, post count)
+- home page should list number of posts
+- home page should list dids underneath? or should not wrap?
 - revert context params to get_page_context, or subsume into one context param
   - redesign `profile` in `ContextData` when you do this
   - maybe do one big loop to optimize at the start when building ctx
